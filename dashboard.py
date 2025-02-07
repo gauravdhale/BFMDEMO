@@ -8,21 +8,22 @@ import requests
 from datetime import datetime, timedelta
 
 # Define Banking Stocks and Bank Nifty Index
-csv_files = {
-    'HDFC Bank': 'HDFC_BANK.csv',
-    'ICICI Bank': 'ICICI_BANK.csv',
-    'State Bank of India': 'SBI.csv',
-    'Kotak Mahindra Bank': 'KOTAK.csv',
-    'Axis Bank': 'AXIS.csv',
-    'Bank of Baroda': 'BARODA.csv'
+banking_stocks = {
+    "HDFC Bank": "HDFCBANK.NS",
+    "ICICI Bank": "ICICIBANK.NS",
+    "State Bank of India": "SBIN.NS",
+    "Kotak Mahindra Bank": "KOTAKBANK.NS",
+    "Axis Bank": "AXISBANK.NS",
+    "Bank of Baroda": "BANKBARODA.NS"
 }
+
 csv_files = {
-    'HDFC Bank': 'HDFC_BANK.csv',
-    'ICICI Bank': 'ICICI_BANK.csv',
-    'State Bank of India': 'SBI.csv',
-    'Kotak Mahindra Bank': 'KOTAK.csv',
-    'Axis Bank': 'AXIS.csv',
-    'Bank of Baroda': 'BARODA.csv'
+    'HDFC Bank': 'data/HDFC_BANK.csv',
+    'ICICI Bank': 'data/ICICI_BANK.csv',
+    'State Bank of India': 'data/SBI.csv',
+    'Kotak Mahindra Bank': 'data/KOTAK.csv',
+    'Axis Bank': 'data/AXIS.csv',
+    'Bank of Baroda': 'data/BARODA.csv'
 }
 bank_nifty_ticker = "^NSEBANK"
 
