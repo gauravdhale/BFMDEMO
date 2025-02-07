@@ -211,4 +211,18 @@ if github_url:
         # Plotting the heatmap
         if 'Weight(%)' in df.columns:
             plt.figure(figsize=(6,8))
-            # The data
+            # The data is one-dimensional, we add a dummy dimension to make it 2D
+            heatmap_data = df[['Weight(%)']]
+            sns.heatmap(heatmap_data, annot=True, cmap='YlGnBu', cbar=True)
+            plt.title('Nifty Bank Composition Heatmap')
+            plt.ylabel('Company')
+            plt.xlabel('')
+            plt.tight_layout()
+            st.pyplot(plt)
+        else:
+            st.write("HEAT MAP ")
+
+    except Exception as e:
+        st.write(f"An error occurred: {e}")
+else:
+    st.write("Please upload a CSV file or enter a valid GitHub URL.")
