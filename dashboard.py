@@ -231,21 +231,3 @@ else:
     data = stock.history(period=period)
     return data
 
-def plot_heatmap(correlation_matrix):
-    fig, ax = plt.subplots(figsize=(8, 6))
-    sns.heatmap(correlation_matrix, annot=True, cmap="coolwarm", fmt=".2f", ax=ax)
-    st.pyplot(fig)
-
-st.set_page_config(page_title="Banking Sector Dashboard", layout="wide")
-st.title("Banking Sector Financial Dashboard")
-
-# Fetching all stock data for correlation heatmap
-all_stock_data = {name: fetch_stock_data(ticker) for name, ticker in banking_stocks.items()}
-closing_prices = pd.DataFrame({name: data["Close"] for name, data in all_stock_data.items() if not data.empty})
-
-if not closing_prices.empty:
-    correlation_matrix = closing_prices.corr()
-    st.subheader("Correlation Heatmap of Banking Stocks")
-    plot_heatmap(correlation_matrix)
-else:
-    st.warning("Not enough data for correlation analysis.")
