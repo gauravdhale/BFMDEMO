@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 import requests
 from datetime import datetime, timedelta
+import seaborn as sns
 
 # Define Banking Stocks and Bank Nifty Index
 companies = {
@@ -186,3 +187,28 @@ st.header(f"📈 Prediction vs Actual - {selected_file.split('.')[0]}")
 plot_actual_vs_predicted(data, selected_file.split('.')[0])
 
 st.success("🎯 Analysis Completed!")
+
+# Adding Heatmap Section
+st.header("Nifty Bank Composition Heatmap")
+
+# Text input for GitHub URL
+github_url = st.text_input("Enter the GitHub CSV file URL", value="https://raw.githubusercontent.com/gauravdhale/BFMDEMO/main/heatmap.csv")
+
+if github_url:
+    try:
+        # Read CSV file from GitHub with specified encoding
+        df = pd.read_csv(github_url, encoding='ISO-8859-1')
+
+        # Set the Company as index for heatmap purposes
+        if 'Company' in df.columns:
+            df.set_index('Company', inplace=True)
+        else:
+            st.write("Error: 'Company' column not found in the CSV file.")
+        
+        # Create a heatmap using seaborn. We need a matrix shape so we'll reshape the data.
+        # We can use a pivot table-like structure with a single column 'Weight(%)'.
+
+        # Plotting the heatmap
+        if 'Weight(%)' in df.columns:
+            plt.figure(figsize=(6,8))
+            # The data
