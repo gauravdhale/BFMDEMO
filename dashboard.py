@@ -15,16 +15,10 @@ if github_url:
         df = pd.read_csv(github_url, encoding='ISO-8859-1')
 
         # Set the Company as index for heatmap purposes
-        if 'Company' in df.columns:
+        if 'Company' in df.columns and 'Weight(%)' in df.columns:
             df.set_index('Company', inplace=True)
-        else:
-            st.write("Error: 'Company' column not found in the CSV file.")
-        
-        # Create a heatmap using seaborn. We need a matrix shape so we'll reshape the data.
-        # We can use a pivot table-like structure with a single column 'Weight(%)'.
 
-        # Plotting the heatmap
-        if 'Weight(%)' in df.columns:
+            # Plotting the heatmap
             plt.figure(figsize=(6,8))
             # The data is one-dimensional, we add a dummy dimension to make it 2D
             heatmap_data = df[['Weight(%)']]
@@ -35,7 +29,8 @@ if github_url:
             plt.tight_layout()
             st.pyplot(plt)
         else:
-            st.write("Error: 'Weight(%)' column not found in the CSV file.")
+            # Skip heatmap generation if required columns are not present
+            st.write("Error: Required columns 'Company' and 'Weight(%)' not found in the CSV file.")
 
     except Exception as e:
         st.write(f"An error occurred: {e}")
