@@ -150,6 +150,7 @@ def get_csv_files():
 def load_data(file_name):
     url = f"https://raw.githubusercontent.com/gauravdhale/BFMDEMO/main/{file_name}"
     try:
+        st.write(f"Loading data from: {url}")
         df = pd.read_csv(url)
         df.columns = df.columns.str.strip()
         df.rename(columns={"Open": "Actual Price", "Predicted_Open": "Predicted Price"}, inplace=True)
@@ -161,7 +162,6 @@ def load_data(file_name):
         return pd.DataFrame()
 
 selected_file = csv_files.get(selected_stock)
-
 data = load_data(selected_file)
 
 # Function to Plot Actual vs Predicted Prices
