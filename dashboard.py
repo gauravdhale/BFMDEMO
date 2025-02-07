@@ -101,16 +101,7 @@ with col2:
 
 # Financial Analysis Section
 st.header("📊 Financial Analysis")
-# Fetching all stock data for correlation heatmap
-all_stock_data = {name: fetch_stock_data(ticker) for name, ticker in banking_stocks.items()}
-closing_prices = pd.DataFrame({name: data["Close"] for name, data in all_stock_data.items() if not data.empty})
 
-if not closing_prices.empty:
-    correlation_matrix = closing_prices.corr()
-    st.subheader("Correlation Heatmap of Banking Stocks")
-    plot_heatmap(correlation_matrix)
-else:
-    st.warning("Not enough data for correlation analysis.")
 
 # Create three columns for better layout
 col4, col5, col6 = st.columns([2, 1, 1])  # Adjusting width for better visibility
