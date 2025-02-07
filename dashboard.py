@@ -33,7 +33,7 @@ def fetch_stock_data(ticker, period="5y"):
         if stock_data.empty:
             return pd.DataFrame()
         stock_data['MA_20'] = stock_data['Close'].rolling(window=20).mean()
-        stock_data['MA_50'] = stock_data['Close'].rolling window=50).mean()
+        stock_data['MA_50'] = stock_data['Close'].rolling(window=50).mean()
         stock_data['Price_Change'] = stock_data['Close'].pct_change()
         return stock_data.dropna()
     except Exception as e:
