@@ -4,9 +4,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
-import requests
-from datetime import datetime, timedelta
 import seaborn as sns
+from datetime import datetime, timedelta
 
 # Define Banking Stocks and Bank Nifty Index
 companies = {
@@ -73,8 +72,6 @@ if not selected_stock_data.empty:
 else:
     st.sidebar.warning(f"No stock data available for {selected_stock}.")
 
-
-
 # BankNifty and Stock Overview
 st.header("📈 Market Overview")
 col1, col2, col3 = st.columns(3)
@@ -101,3 +98,15 @@ with col2:
     else:
         st.warning(f"No data available for {selected_stock}.")
 
+# Fetching all stock data for correlation heatmap
+all_stock_data = {name: fetch_stock_data(ticker) for name, ticker in companies.items()}
+closing_prices = pd.DataFrame({name: data["Close"] for name, data in all_stock_data.items() if not data.empty})
+
+if not closing_prices.empty:
+    correlation_matrix = closing_prices.corr()
+    st.subheader("Correlation Heatmap of Banking Stocks")
+    fig, ax = plt.subplots(figsize=(8, 6))
+    sns.heatmap(correlation_matrix, annot=True, cmap="coolwarm", fmt=".2f", ax=ax)
+    st.pyplot(fig)
+else:
+    st.warning("Not enough data for correlation analysis.")
