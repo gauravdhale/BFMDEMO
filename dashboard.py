@@ -20,7 +20,7 @@ def fetch_stock_data(ticker, period="5y"):
     return data
 
 def plot_heatmap(correlation_matrix):
-    fig, ax = plt.subplots(figsize=(4, 4))  # Adjusted size
+    fig, ax = plt.subplots(figsize=(3, 3))  # Adjusted size to be smaller
     sns.heatmap(correlation_matrix, annot=True, cmap="coolwarm", fmt=".2f", ax=ax)
     st.pyplot(fig)
 
