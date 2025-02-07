@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 
 # Define Banking Stocks and Bank Nifty Index
 companies = {
-    'HDFC Bank': 'HDFC_BANK.NS',
+    'HDFC Bank': 'HDFCBANK.NS',
     'ICICI Bank': 'ICICIBANK.NS',
     'State Bank of India': 'SBIN.NS',
     'Kotak Mahindra Bank': 'KOTAKBANK.NS',
@@ -18,7 +18,7 @@ companies = {
 }
 
 csv_files = {
-    'HDFC Bank': 'HDFC_BANK.csv',
+    'HDFC Bank': 'HDFCBANK.csv',
     'ICICI Bank': 'ICICI_BANK.csv',
     'State Bank of India': 'SBI.csv',
     'Kotak Mahindra Bank': 'KOTAK.csv',
