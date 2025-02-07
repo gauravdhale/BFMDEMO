@@ -136,7 +136,7 @@ with col5:
 # Function to get the list of CSV files from GitHub
 @st.cache_data
 def get_csv_files():
-    api_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents"
+    api_url = "https://api.github.com/repos/gauravdhale/BFMDEMO/contents"
     response = requests.get(api_url)
     if response.status_code == 200:
         files = [file["name"] for file in response.json() if file["name"].endswith(".csv")]
@@ -148,7 +148,7 @@ def get_csv_files():
 # Load Selected Data
 @st.cache_data
 def load_data(file_name):
-    url = f"https://raw.githubusercontent.com/{GITHUB_REPO}/{BRANCH}/{file_name}"
+    url = f"https://raw.githubusercontent.com/gauravdhale/BFMDEMO/main/{file_name}"
     try:
         df = pd.read_csv(url)
         df.columns = df.columns.str.strip()
