@@ -209,5 +209,7 @@ if github_url:
         # We can use a pivot table-like structure with a single column 'Weight(%)'.
 
         # Plotting the heatmap
-        if 'Weight(%)' in df.columns:
-            plt.figure(figsize=(6,8))
+       try:
+    plt.figure(figsize=(6, 8))  
+except Exception as e:
+    print(f"An error occurred: {e}")
