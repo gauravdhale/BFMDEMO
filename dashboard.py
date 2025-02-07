@@ -3,6 +3,7 @@ import yfinance as yf
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 import seaborn as sns
 from datetime import datetime, timedelta
 
@@ -16,6 +17,14 @@ companies = {
     'Bank of Baroda': 'BANKBARODA.NS'
 }
 
+csv_files = {
+    'HDFC Bank': 'HDFCBANK.csv',
+    'ICICI Bank': 'ICICI_BANK.csv',
+    'State Bank of India': 'SBI.csv',
+    'Kotak Mahindra Bank': 'KOTAK.csv',
+    'Axis Bank': 'AXIS.csv',
+    'Bank of Baroda': 'BARODA.csv'
+}
 bank_nifty_ticker = "^NSEBANK"
 
 # Streamlit Configuration
@@ -91,7 +100,7 @@ with col2:
 
 # Fetching all stock data for correlation heatmap
 all_stock_data = {name: fetch_stock_data(ticker) for name, ticker in companies.items()}
-closing_prices = pd.DataFrame({name: data["Close"] for name, data in all_stock_data.items() if not data.empty and "Close" in data.columns})
+closing_prices = pd.DataFrame({name: data["Close"] for name, data in all_stock_data.items() if not data.empty})
 
 if not closing_prices.empty:
     correlation_matrix = closing_prices.corr()
