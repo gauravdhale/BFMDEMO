@@ -12,8 +12,8 @@ github_url = st.text_input("Enter the GitHub CSV file URL", value="https://raw.g
 
 if github_url:
     try:
-        # Read CSV file from GitHub
-        df = pd.read_csv(github_url)
+        # Read CSV file from GitHub with specified encoding
+        df = pd.read_csv(github_url, encoding='ISO-8859-1')
 
         # Display data
         st.write("Data from CSV file:")
