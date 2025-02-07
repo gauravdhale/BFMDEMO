@@ -1,32 +1,53 @@
 # Import necessary libraries
+import streamlit as st
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-# Create the dataframe with the provided data
-data = {
-    'Company': ['HDFC Bank Ltd.', 'ICICI Bank Ltd.', 'Kotak Mahindra Bank Ltd.', 'State Bank of India', 
-                'Axis Bank Ltd.', 'IndusInd Bank Ltd.', 'Federal Bank Ltd.', 'Bank of Baroda',
-                'IDFC First Bank Ltd.', 'Punjab National Bank', 'Other'],
-    'Weight(%)': [27.63, 25.05, 9.61, 8.43, 8.11, 4.78, 3.34, 2.90, 2.86, 2.54, 4.75]
-}
-df = pd.DataFrame(data)
+# Title of the app
+st.title("Nifty Bank Composition Heatmap")
 
-# Set the Company as index for heatmap purposes
-df.set_index('Company', inplace=True)
+# Text input for GitHub URL
+github_url = st.text_input("Enter the GitHub CSV file URL", value="https://raw.githubusercontent.com/gauravdhale/BFMDEMO/main/heatmap.csv")
 
-# Create a heatmap using seaborn. We need a matrix shape so we'll reshape the data.
-# We can use a pivot table-like structure with a single column 'Weight(%)'.
+if github_url:
+    try:
+        # Read CSV file from GitHub with specified encoding
+        df = pd.read_csv(github_url, encoding='ISO-8859-1')
 
-# Plotting the heatmap
-plt.figure(figsize=(6,8))
-# The data is one-dimensional, we add a dummy dimension to make it 2D
-heatmap_data = df[['Weight(%)']]
-sns.heatmap(heatmap_data, annot=True, cmap='YlGnBu', cbar=True)
-plt.title('Nifty Bank Composition Heatmap')
-plt.ylabel('Company')
-plt.xlabel('')
-plt.tight_layout()
-plt.show()
+        # Print the column names to debug
+        st.write("Column names in the CSV file:")
+        st.write(df.columns)
 
-print('Heatmap generated for Nifty Bank composition.')
+        # Display data
+        st.write("Data from CSV file:")
+        st.write(df)
+
+        # Set the Company as index for heatmap purposes
+        if 'Company' in df.columns:
+            df.set_index('Company', inplace=True)
+        else:
+            st.write("Error: 'Company' column not found in the CSV file.")
+        
+        # Create a heatmap using seaborn. We need a matrix shape so we'll reshape the data.
+        # We can use a pivot table-like structure with a single column 'Weight(%)'.
+
+        # Plotting the heatmap
+        if 'Weight(%)' in df.columns:
+            plt.figure(figsize=(6,8))
+            # The data is one-dimensional, we add a dummy dimension to make it 2D
+            heatmap_data = df[['Weight(%)']]
+            sns.heatmap(heatmap_data, annot=True, cmap='YlGnBu', cbar=True)
+            plt.title('Nifty Bank Composition Heatmap')
+            plt.ylabel('Company')
+            plt.xlabel('')
+            plt.tight_layout()
+            st.pyplot(plt)
+            st.write("Heatmap generated for Nifty Bank composition.")
+        else:
+            st.write("Error: 'Weight(%)' column not found in the CSV file.")
+
+    except Exception as e:
+        st.write(f"An error occurred: {e}")
+else:
+    st.write("Please upload a CSV file or enter a valid GitHub URL.")
