@@ -4,6 +4,9 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
+import requests
+from statsmodels.tsa.arima.model import ARIMA
+import plotly.graph_objects as go
 
 # Define Banking Stocks and Bank Nifty Index
 companies = {
@@ -23,6 +26,41 @@ st.markdown("---")
 
 # Selection Dropdown
 selected_stock = st.sidebar.selectbox("🔍 Select a Bank", list(companies.keys()))
+
+# GitHub Repository Details
+GITHUB_REPO = "gauravdhale/Fin"
+BRANCH = "main"
+
+# Function to get the list of CSV files from GitHub
+@st.cache_data
+def get_csv_files():
+    api_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents"
+    response = requests.get(api_url)
+    if response.status_code == 200:
+        files = [file["name"] for file in response.json() if file["name"].endswith(".csv")]
+        return files
+    else:
+        st.error("Error fetching file list from GitHub")
+        return []
+
+# Get List of CSV Files
+csv_files = get_csv_files()
+
+# Dropdown to Select CSV File
+if csv_files:
+    selected_file = st.sidebar.selectbox("Select a Bank Stock", csv_files)
+else:
+    st.error("No CSV files found in GitHub repository.")
+    st.stop()
+
+# Function to Read CSV File from GitHub
+@st.cache_data
+def load_data(file_name):
+    url = f"https://raw.githubusercontent.com/{GITHUB_REPO}/{BRANCH}/{file_name}"
+    return pd.read_csv(url)
+
+# Fetch Data
+selected_file_data = load_data(selected_file)
 
 # Function to Fetch Stock Data
 def fetch_stock_data(ticker, period="5y"):
@@ -59,7 +97,7 @@ if not selected_stock_data.empty:
     for label, value in metric_values.items():
         st.sidebar.metric(label=label, value=f"{value:.2f}" if isinstance(value, (int, float)) else value)
 else:
-    st.sidebar.warning(f"No stock data available for {selected_stock}.") 
+    st.sidebar.warning(f"No stock data available for {selected_stock}.")
 
 # BankNifty and Stock Overview
 st.header("📈 Market Overview")
@@ -122,5 +160,24 @@ with col5:
         st.dataframe(bank_nifty_data.tail(10).style.format({"Close": "{:.2f}", "Open": "{:.2f}", "High": "{:.2f}", "Low": "{:.2f}"}))
     else:
         st.warning("No BankNifty data available.")
+
+# Custom Graph Integration
+st.header("📊 Custom Graph Integration")
+
+if not selected_file_data.empty:
+    # Example ARIMA Model Plot
+    st.subheader("ARIMA Model Plot")
+    stock_close = selected_file_data['Close']
+    model = ARIMA(stock_close, order=(5,1,0))
+    model_fit = model.fit()
+    forecast = model_fit.forecast(steps=30)[0]
+
+    # Plotting
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=selected_file_data.index, y=stock_close, mode='lines', name='Actual'))
+    fig.add_trace(go.Scatter(x=pd.date_range(start=selected_file_data.index[-1], periods=30, freq='D'), y=forecast, mode='lines', name='Forecast'))
+    st.plotly_chart(fig)
+else:
+    st.warning("No data available for the selected file.")
 
 st.success("🎯 Analysis Completed!")
