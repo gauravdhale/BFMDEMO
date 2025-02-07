@@ -1,4 +1,3 @@
-# Import necessary libraries
 import streamlit as st
 import pandas as pd
 import seaborn as sns
@@ -14,14 +13,6 @@ if github_url:
     try:
         # Read CSV file from GitHub with specified encoding
         df = pd.read_csv(github_url, encoding='ISO-8859-1')
-
-        # Print the column names to debug
-        st.write("Column names in the CSV file:")
-        st.write(df.columns)
-
-        # Display data
-        st.write("Data from CSV file:")
-        st.write(df)
 
         # Set the Company as index for heatmap purposes
         if 'Company' in df.columns:
@@ -43,7 +34,6 @@ if github_url:
             plt.xlabel('')
             plt.tight_layout()
             st.pyplot(plt)
-            st.write("Heatmap generated for Nifty Bank composition.")
         else:
             st.write("Error: 'Weight(%)' column not found in the CSV file.")
 
