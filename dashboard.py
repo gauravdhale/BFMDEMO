@@ -3,7 +3,6 @@ import yfinance as yf
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
 from datetime import datetime, timedelta
 
 # Define Banking Stocks and Bank Nifty Index
@@ -123,69 +122,5 @@ with col5:
         st.dataframe(bank_nifty_data.tail(10).style.format({"Close": "{:.2f}", "Open": "{:.2f}", "High": "{:.2f}", "Low": "{:.2f}"}))
     else:
         st.warning("No BankNifty data available.")
-# 🔹 Heatmap for Nifty Bank Companies
-with col6:
-    st.subheader("📊 Correlation Heatmap for Nifty Bank Companies")
-
-# Fetch Data for all companies
-data = {name: fetch_stock_data(ticker) for name, ticker in companies.items()}
-
-# Debug: Print the structure of data
-for key, value in data.items():
-    if value is None or value.empty:
-        print(f"⚠ Warning: No data for {key}")
-    else:
-        print(f"✅ {key} data loaded: {value.shape}")
-
-# Remove None or empty values
-filtered_data = {k: v for k, v in data.items() if v is not None and not v.empty}
-
-if filtered_data:
-    try:
-        # Ensure each stock's data is a pandas Series or DataFrame
-        aligned_data = {}
-
-        for name, stock_data in filtered_data.items():
-            if isinstance(stock_data, pd.DataFrame):
-                # If it's a DataFrame, extract the 'Close' column (or any other relevant column)
-                if 'Close' in stock_data.columns:
-                    aligned_data[name] = stock_data['Close']
-                else:
-                    st.error(f"⚠ 'Close' column missing in {name} data")
-            elif isinstance(stock_data, pd.Series):
-                aligned_data[name] = stock_data
-            elif isinstance(stock_data, (int, float)):  # If scalar value
-                aligned_data[name] = pd.Series([stock_data], index=[0])  # Wrap in Series with index
-            else:
-                st.error(f"⚠ Invalid data format for {name}")
-
-        # Now ensure that the data is aligned
-        if aligned_data:
-            # If all data is scalar, wrap the data in a list and pass index
-            if all(isinstance(v, (int, float)) for v in aligned_data.values()):
-                aligned_data = {k: pd.Series([v], index=[0]) for k, v in aligned_data.items()}
-            
-            # Now create the DataFrame
-            stock_prices = pd.DataFrame(aligned_data)
-
-            if stock_prices.empty:
-                st.warning("Stock data is empty after filtering.")
-            else:
-                stock_prices.dropna(inplace=True)
-
-                # Correlation Matrix
-                correlation_matrix = stock_prices.corr()
-
-                # Plot Heatmap
-                st.subheader("📊 Correlation Heatmap for Nifty Bank Companies")
-                fig, ax = plt.subplots(figsize=(8, 6))
-                sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt=".2f", linewidths=0.5, ax=ax)
-                st.pyplot(fig)
-        else:
-            st.warning("No valid stock data available for the heatmap.")
-    except Exception as e:
-        st.error(f"Error processing stock data: {e}")
-else:
-    st.warning("No valid stock data available to generate heatmap.")
 
 st.success("🎯 Analysis Completed!")
