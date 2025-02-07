@@ -35,7 +35,7 @@ if github_url:
             plt.tight_layout()
             st.pyplot(plt)
         else:
-            st.write("Error: 'Weight(%)' column not found in the CSV file.")
+            st.write("HEAT MAP ")
 
     except Exception as e:
         st.write(f"An error occurred: {e}")
