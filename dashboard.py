@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 st.title("Nifty Bank Composition Heatmap")
 
 # Text input for GitHub URL
-github_url = st.text_input("Enter the GitHub CSV file URL", value="https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPOSITORY/main/heatmap.csv")
+github_url = st.text_input("Enter the GitHub CSV file URL", value="https://raw.githubusercontent.com/gauravdhale/BFMDEMO/main/heatmap.csv")
 
 if github_url:
     try:
@@ -39,3 +39,5 @@ if github_url:
         st.write("Heatmap generated for Nifty Bank composition.")
     except Exception as e:
         st.write(f"An error occurred: {e}")
+else:
+    st.write("Please upload a CSV file or enter a valid GitHub URL.")
