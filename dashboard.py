@@ -211,4 +211,3 @@ if github_url:
         # Plotting the heatmap
         if 'Weight(%)' in df.columns:
             plt.figure(figsize=(6,8))
-            # The data
