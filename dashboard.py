@@ -15,13 +15,16 @@ banking_stocks = {
 }
 
 def fetch_stock_data(ticker, period="5y"):
+    """Fetch historical stock data from Yahoo Finance."""
     stock = yf.Ticker(ticker)
     data = stock.history(period=period)
     return data
 
-def plot_heatmap(correlation_matrix):
-    fig, ax = plt.subplots(figsize=(8, 6))
-    sns.heatmap(correlation_matrix, annot=True, cmap="coolwarm", fmt=".2f", ax=ax)
+def plot_heatmap(data, title):
+    """Plot a heatmap to visualize relationships between banking stocks."""
+    fig, ax = plt.subplots(figsize=(10, 8))
+    sns.heatmap(data, annot=True, cmap="coolwarm", fmt=".2f", linewidths=0.5, ax=ax)
+    plt.title(title)
     st.pyplot(fig)
 
 st.set_page_config(page_title="Banking Sector Dashboard", layout="wide")
@@ -32,8 +35,11 @@ all_stock_data = {name: fetch_stock_data(ticker) for name, ticker in banking_sto
 closing_prices = pd.DataFrame({name: data["Close"] for name, data in all_stock_data.items() if not data.empty})
 
 if not closing_prices.empty:
-    correlation_matrix = closing_prices.corr()
+    closing_prices.dropna(inplace=True)  # Remove missing values
+    correlation_matrix = closing_prices.corr()  # Compute correlation matrix
+    
     st.subheader("Correlation Heatmap of Banking Stocks")
-    plot_heatmap(correlation_matrix)
+    plot_heatmap(correlation_matrix, "Stock Price Correlation")
+
 else:
     st.warning("Not enough data for correlation analysis.")
