@@ -24,7 +24,7 @@ csv_files = {
     'Kotak Mahindra Bank': 'KOTAK.csv',
     'Axis Bank': 'AXIS.csv',
     'Bank of Baroda': 'BARODA.csv'
-}
+} 
 bank_nifty_ticker = "^NSEBANK"
 
 # Streamlit Configuration
@@ -133,6 +133,17 @@ with col5:
         st.dataframe(bank_nifty_data.tail(10).style.format({"Close": "{:.2f}", "Open": "{:.2f}", "High": "{:.2f}", "Low": "{:.2f}"}))
     else:
         st.warning("No BankNifty data available.")
+
+# Fetching all stock data for correlation heatmap
+all_stock_data = {name: fetch_stock_data(ticker) for name, ticker in banking_stocks.items()}
+closing_prices = pd.DataFrame({name: data["Close"] for name, data in all_stock_data.items() if not data.empty})
+
+if not closing_prices.empty:
+    correlation_matrix = closing_prices.corr()
+    st.subheader("Correlation Heatmap of Banking Stocks")
+    plot_heatmap(correlation_matrix)
+else:
+    st.warning("Not enough data for correlation analysis.")
 
 # Function to get the list of CSV files from GitHub
 @st.cache_data
