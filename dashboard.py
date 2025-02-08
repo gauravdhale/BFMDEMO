@@ -201,28 +201,24 @@ with st.container():
         st.pyplot(fig_pr)
     
     with st.container():
-        st.subheader("Nifty Bank Composition Heatmap")
-        github_url = "https://raw.githubusercontent.com/gauravdhale/BFMDEMO/main/heatmap.csv"
-        try:
-            df_heatmap = pd.read_csv(github_url, encoding='ISO-8859-1')
-            if 'Company' in df_heatmap.columns and 'Weight(%)' in df_heatmap.columns:
-                df_heatmap.set_index('Company', inplace=True)
-                fig_hm, ax_hm = plt.subplots(figsize=(5, 3))
-                sns.heatmap(df_heatmap
-                                if 'Company' in df_heatmap.columns and 'Weight(%)' in df_heatmap.columns:
-                    df_heatmap.set_index('Company', inplace=True)
-                    fig_hm, ax_hm = plt.subplots(figsize=(5, 3))
-                    sns.heatmap(df_heatmap[['Weight(%)']], annot=True, cmap='YlGnBu', cbar=True, linewidths=0.5, ax=ax_hm)
-                    ax_hm.set_title('Nifty Bank Composition')
-                    st.pyplot(fig_hm)
-                else:
-                    st.write("Heatmap data not available.")
-            except Exception as e:
-                st.write(f"An error occurred: {e}")
-    
-    with st.container():
-        st.subheader(f"Correlation Matrix - {selected_stock}")
-        plot_correlation_heatmap(selected_stock_data, selected_stock)
+    st.subheader("Nifty Bank Composition Heatmap")
+    github_url = "https://raw.githubusercontent.com/gauravdhale/BFMDEMO/main/heatmap.csv"
+    try:
+        df_heatmap = pd.read_csv(github_url, encoding='ISO-8859-1')
+        if 'Company' in df_heatmap.columns and 'Weight(%)' in df_heatmap.columns:
+            df_heatmap.set_index('Company', inplace=True)
+            fig_hm, ax_hm = plt.subplots(figsize=(5, 3))
+            sns.heatmap(df_heatmap[['Weight(%)']], annot=True, cmap='YlGnBu', cbar=True, linewidths=0.5, ax=ax_hm)
+            ax_hm.set_title('Nifty Bank Composition')
+            st.pyplot(fig_hm)
+        else:
+            st.write("Heatmap data not available.")
+    except Exception as e:
+        st.write(f"An error occurred: {e}")
+
+with st.container():
+    st.subheader(f"Correlation Matrix - {selected_stock}")
+    plot_correlation_heatmap(selected_stock_data, selected_stock)
 
 st.markdown("---")
 st.markdown("## 📋 Data Overview")
