@@ -56,6 +56,14 @@ st.markdown(
     .stHeader {
         background-color: #1f4e79;
     }
+    /* Metric text color */
+    [data-testid="stMetricValue"] {
+        color: #f0f2f6;
+    }
+    /* Center align the title */
+    .css-10trblm {
+        text-align: center;
+    }
     </style>
     """,
     unsafe_allow_html=True
@@ -89,15 +97,17 @@ selected_stock_data = fetch_stock_data(companies[selected_stock])
 st.sidebar.header("📌 **Key Metrics**")
 if not selected_stock_data.empty:
     latest_data = selected_stock_data.iloc[-1]
+
+    # Ensure that each metric is a scalar value
     metric_values = {
-        "Open": latest_data["Open"],
-        "Close": latest_data["Close"],
-        "High": latest_data["High"],
-        "Low": latest_data["Low"],
-        "EPS": np.random.uniform(10, 50),
-        "IPO Price": np.random.uniform(200, 1000),
-        "P/E Ratio": np.random.uniform(5, 30),
-        "Dividend": np.random.uniform(1, 5)
+        "Open": float(latest_data["Open"]),
+        "Close": float(latest_data["Close"]),
+        "High": float(latest_data["High"]),
+        "Low": float(latest_data["Low"]),
+        "EPS": float(np.random.uniform(10, 50)),
+        "IPO Price": float(np.random.uniform(200, 1000)),
+        "P/E Ratio": float(np.random.uniform(5, 30)),
+        "Dividend": float(np.random.uniform(1, 5))
     }
     for label, value in metric_values.items():
         st.sidebar.metric(label=f"**{label}**", value=f"{value:.2f}")
@@ -271,8 +281,11 @@ def plot_actual_vs_predicted(data, company_name):
     st.plotly_chart(fig, use_container_width=True)
 
 # Plot Data
-st.header(f"📈 **Prediction vs Actual - {selected_file.split('.')[0]}**")
-plot_actual_vs_predicted(data, selected_file.split('.')[0])
+if selected_file:
+    st.header(f"📈 **Prediction vs Actual - {selected_file.split('.')[0]}**")
+    plot_actual_vs_predicted(data, selected_file.split('.')[0])
+else:
+    st.warning("No CSV file selected for the chosen stock.")
 
 # Adding Heatmap Section
 st.header("🌡️ **Nifty Bank Composition Heatmap**")
@@ -320,4 +333,3 @@ else:
 
 st.markdown("---")
 st.success("✅ **Dashboard enhanced successfully!**")
-
