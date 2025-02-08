@@ -5,15 +5,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
 import seaborn as sns
 
-# --- Streamlit Configuration ---
-st.set_page_config(page_title="Banking Sector Dashboard", layout="wide")
-st.title("📊 Banking Sector Financial Dashboard")
-st.markdown("---")
-
-# --- Define Banking Stocks and Bank Nifty Index ---
+# Define Banking Stocks and Bank Nifty Index
 companies = {
     'HDFC Bank': 'HDFCBANK.NS',
     'ICICI Bank': 'ICICIBANK.NS',
@@ -31,13 +26,17 @@ csv_files = {
     'Axis Bank': 'AXIS.csv',
     'Bank of Baroda': 'BARODA.csv'
 }
-
 bank_nifty_ticker = "^NSEBANK"
 
-# --- Selection Dropdown ---
+# Streamlit Configuration
+st.set_page_config(page_title="Banking Sector Dashboard", layout="wide")
+st.title("📊 Banking Sector Financial Dashboard")
+st.markdown("---")
+
+# Selection Dropdown
 selected_stock = st.sidebar.selectbox("🔍 Select a Bank", list(companies.keys()))
 
-# --- Function to Fetch Stock Data ---
+# Function to Fetch Stock Data
 def fetch_stock_data(ticker, period="5y"):
     try:
         stock_data = yf.download(ticker, period=period, interval="1d")
@@ -51,11 +50,24 @@ def fetch_stock_data(ticker, period="5y"):
         st.error(f"Error fetching data for {ticker}: {e}")
         return pd.DataFrame()
 
-# --- Load Selected Data ---
+# Function to get the list of CSV files from GitHub
+@st.cache_data
+def get_csv_files():
+    api_url = "https://api.github.com/repos/gauravdhale/BFMDEMO/contents"
+    response = requests.get(api_url)
+    if response.status_code == 200:
+        files = [file["name"] for file in response.json() if file["name"].endswith(".csv")]
+        return files
+    else:
+        st.error("Error fetching file list from GitHub")
+        return []
+
+# Load Selected Data
 @st.cache_data
 def load_data(file_name):
     url = f"https://raw.githubusercontent.com/gauravdhale/BFMDEMO/main/{file_name}"
     try:
+        st.write(f"Loading data from: {url}")
         df = pd.read_csv(url)
         df.columns = df.columns.str.strip()
         df.rename(columns={"Open": "Actual Price", "Predicted_Open": "Predicted Price"}, inplace=True)
@@ -66,7 +78,7 @@ def load_data(file_name):
         st.error(f"Error reading {file_name}: {e}")
         return pd.DataFrame()
 
-# --- Function to Plot Actual vs Predicted Prices ---
+# Function to Plot Actual vs Predicted Prices
 def plot_actual_vs_predicted(data, company_name):
     if data.empty:
         st.warning(f"No data available for {company_name}.")
@@ -79,35 +91,27 @@ def plot_actual_vs_predicted(data, company_name):
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=data.index, y=data["Actual Price"], mode="lines", name="Actual Price", line=dict(color="blue")))
     fig.add_trace(go.Scatter(x=data.index, y=data["Predicted Price"], mode="lines", name="Predicted Price", line=dict(color="red", dash="dash")))
-    fig.update_layout(
-        title=f"{company_name} - Actual vs Predicted Prices",
-        xaxis_title="Date",
-        yaxis_title="Price",
-        hovermode="x unified",
-        height=300,
-        margin=dict(l=10, r=10, t=30, b=10)
-    )
+    fig.update_layout(title=f"{company_name} - Actual vs Predicted Prices", xaxis_title="Date", yaxis_title="Price", hovermode="x unified", height=300)
     st.plotly_chart(fig, use_container_width=True)
 
-# --- Function to Plot Correlation Heatmap ---
+# Function to Plot Correlation Heatmap
 def plot_correlation_heatmap(data, company_name):
     if data.empty:
         st.warning(f"No data available for {company_name} to compute correlation matrix.")
         return
     corr = data.corr()
-    fig, ax = plt.subplots(figsize=(5, 3))
-    sns.heatmap(corr, annot=True, cmap='coolwarm', fmt=".2f", linewidths=0.5, ax=ax)
-    ax.set_title(f"{company_name} - Correlation Matrix Heatmap")
-    plt.tight_layout()
-    st.pyplot(fig)
+    plt.figure(figsize=(6, 4))
+    sns.heatmap(corr, annot=True, cmap='coolwarm', fmt=".2f", linewidths=0.5)
+    plt.title(f"{company_name} - Correlation Matrix Heatmap")
+    st.pyplot(plt)
 
-# --- Fetch Data ---
+# Fetch Data
 bank_nifty_data = fetch_stock_data(bank_nifty_ticker)
 selected_stock_data = fetch_stock_data(companies[selected_stock])
 selected_file = csv_files.get(selected_stock)
 data = load_data(selected_file)
 
-# --- Display Metrics if Data is Available ---
+# Display Metrics if Data is Available
 st.sidebar.header("📌 Key Metrics")
 if not selected_stock_data.empty:
     latest_data = selected_stock_data.iloc[-1]
@@ -121,24 +125,15 @@ if not selected_stock_data.empty:
         "P/E Ratio": np.random.uniform(5, 30),
         "Dividend": np.random.uniform(1, 5)
     }
-    metrics = list(metric_values.items())
-    # Display metrics in two columns in the sidebar
-    col1, col2 = st.sidebar.columns(2)
-    for i in range(0, len(metrics), 2):
-        with col1:
-            label, value = metrics[i]
-            st.metric(label=label, value=f"{value:.2f}")
-        if i+1 < len(metrics):
-            with col2:
-                label, value = metrics[i+1]
-                st.metric(label=label, value=f"{value:.2f}")
+    for label, value in metric_values.items():
+        st.sidebar.metric(label=label, value=f"{value:.2f}" if isinstance(value, (int, float)) else value)
 else:
     st.sidebar.warning(f"No stock data available for {selected_stock}.")
 
-# --- First Row: Market Trends ---
+# Layout Adjustments for Proper Alignment
+# First Row: BankNifty Trend and Selected Stock Trend
 st.markdown("## 📈 Market Trends")
-row1_col1, row1_col2, row1_col3 = st.columns([1, 1, 1])
-
+row1_col1, row1_col2, row1_col3 = st.columns(3)
 with row1_col1:
     st.subheader("BankNifty Trend")
     if not bank_nifty_data.empty:
@@ -146,7 +141,6 @@ with row1_col1:
         ax1.plot(bank_nifty_data.index, bank_nifty_data['Close'], label="BankNifty Close", color='blue')
         ax1.legend()
         ax1.set_title("BankNifty Close Price")
-        plt.tight_layout()
         st.pyplot(fig1)
     else:
         st.warning("No data available for BankNifty.")
@@ -158,7 +152,6 @@ with row1_col2:
         ax2.plot(selected_stock_data.index, selected_stock_data['Close'], label=f"{selected_stock} Close", color='red')
         ax2.legend()
         ax2.set_title(f"{selected_stock} Close Price")
-        plt.tight_layout()
         st.pyplot(fig2)
     else:
         st.warning(f"No data available for {selected_stock}.")
@@ -167,10 +160,9 @@ with row1_col3:
     st.subheader("Prediction vs Actual")
     plot_actual_vs_predicted(data, selected_stock)
 
-# --- Second Row: Financial Analysis ---
+# Second Row: Profit vs Revenue and Heatmaps
 st.markdown("## 📊 Financial Analysis")
-row2_col1, row2_col2, row2_col3 = st.columns([1, 1, 1])
-
+row2_col1, row2_col2, row2_col3 = st.columns(3)
 with row2_col1:
     st.subheader("Profit vs Revenue")
     profit_revenue_data = pd.DataFrame({
@@ -185,7 +177,6 @@ with row2_col1:
     ax_pr.set_ylabel("Amount (INR in Lakhs)")
     ax_pr.grid(axis='y', linestyle="--", alpha=0.5)
     ax_pr.legend()
-    plt.tight_layout()
     st.pyplot(fig_pr)
 
 with row2_col2:
@@ -196,37 +187,29 @@ with row2_col2:
             df_heatmap = pd.read_csv(github_url, encoding='ISO-8859-1')
             if 'Company' in df_heatmap.columns and 'Weight(%)' in df_heatmap.columns:
                 df_heatmap.set_index('Company', inplace=True)
-                fig_hm, ax_hm = plt.subplots(figsize=(5, 3))
+                plt.figure(figsize=(6, 4))
                 heatmap_data = df_heatmap[['Weight(%)']]
-                sns.heatmap(heatmap_data, annot=True, cmap='YlGnBu', cbar=True, linewidths=0.5, ax=ax_hm)
-                ax_hm.set_title('Nifty Bank Composition')
+                sns.heatmap(heatmap_data, annot=True, cmap='YlGnBu', cbar=True, linewidths=0.5)
+                plt.title('Nifty Bank Composition')
+                plt.xlabel('')
                 plt.tight_layout()
-                st.pyplot(fig_hm)
+                st.pyplot(plt)
             else:
-                st.warning("Heatmap data not available.")
+                st.write("Heatmap data not available.")
         except Exception as e:
-            st.error(f"An error occurred: {e}")
+            st.write(f"An error occurred: {e}")
     else:
-        st.warning("Please enter a valid GitHub URL.")
+        st.write("Please enter a valid GitHub URL.")
 
 with row2_col3:
     st.subheader(f"Correlation Matrix - {selected_stock}")
     plot_correlation_heatmap(selected_stock_data, selected_stock)
 
-# --- Third Row: Data Overview ---
+# Third Row: Data Table
 st.markdown("## 📋 Data Overview")
 with st.expander("BankNifty Index Data Table"):
     if not bank_nifty_data.empty:
-        st.dataframe(
-            bank_nifty_data.tail(10).style.format(
-                {
-                    "Close": "{:.2f}",
-                    "Open": "{:.2f}",
-                    "High": "{:.2f}",
-                    "Low": "{:.2f}"
-                }
-            )
-        )
+        st.dataframe(bank_nifty_data.tail(10).style.format({"Close": "{:.2f}", "Open": "{:.2f}", "High": "{:.2f}", "Low": "{:.2f}"}))
     else:
         st.warning("No BankNifty data available.")
 
