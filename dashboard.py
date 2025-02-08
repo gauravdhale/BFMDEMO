@@ -150,9 +150,8 @@ else:
 # Layout Adjustments for Proper Alignment
 st.markdown("## 📈 Market Trends")
 with st.container():
-    row1_col1, row1_col2, row1_col3 = st.columns(3, gap="medium")
-    with row1_col1:
-        st.subheader("BankNifty Trend")
+    st.subheader("BankNifty Trend")
+    with st.container():
         if not bank_nifty_data.empty:
             fig1, ax1 = plt.subplots(figsize=(5, 3))
             ax1.plot(bank_nifty_data.index, bank_nifty_data['Close'], label="BankNifty Close", color='blue')
@@ -163,8 +162,9 @@ with st.container():
             st.pyplot(fig1)
         else:
             st.warning("No data available for BankNifty.")
-    with row1_col2:
-        st.subheader(f"{selected_stock} Trend")
+
+    st.subheader(f"{selected_stock} Trend")
+    with st.container():
         if not selected_stock_data.empty:
             fig2, ax2 = plt.subplots(figsize=(5, 3))
             ax2.plot(selected_stock_data.index, selected_stock_data['Close'], label=f"{selected_stock} Close", color='red')
@@ -175,16 +175,16 @@ with st.container():
             st.pyplot(fig2)
         else:
             st.warning(f"No data available for {selected_stock}.")
-    with row1_col3:
-        st.subheader("Prediction vs Actual")
+
+    st.subheader("Prediction vs Actual")
+    with st.container():
         plot_actual_vs_predicted(data, selected_stock)
 
 st.markdown("---")
 st.markdown("## 📊 Financial Analysis")
 with st.container():
-    row2_col1, row2_col2, row2_col3 = st.columns(3, gap="medium")
-    with row2_col1:
-        st.subheader("Profit vs Revenue")
+    st.subheader("Profit vs Revenue")
+    with st.container():
         profit_revenue_data = pd.DataFrame({
             "Year": np.arange(2015, 2025),
             "Total Revenue": np.random.randint(50000, 150000, 10),
@@ -198,8 +198,9 @@ with st.container():
         ax_pr.grid(axis='y', linestyle="--", alpha=0.5)
         ax_pr.legend()
         st.pyplot(fig_pr)
-    with row2_col2:
-        st.subheader("Nifty Bank Composition Heatmap")
+
+    st.subheader("Nifty Bank Composition Heatmap")
+    with st.container():
         github_url = "https://raw.githubusercontent.com/gauravdhale/BFMDEMO/main/heatmap.csv"
         try:
             df_heatmap = pd.read_csv(github_url, encoding='ISO-8859-1')
@@ -213,8 +214,9 @@ with st.container():
                 st.write("Heatmap data not available.")
         except Exception as e:
             st.write(f"An error occurred: {e}")
-    with row2_col3:
-        st.subheader(f"Correlation Matrix - {selected_stock}")
+
+    st.subheader(f"Correlation Matrix - {selected_stock}")
+    with st.container():
         plot_correlation_heatmap(selected_stock_data, selected_stock)
 
 st.markdown("---")
