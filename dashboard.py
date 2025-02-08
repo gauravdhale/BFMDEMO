@@ -92,7 +92,7 @@ def plot_actual_vs_predicted(data, company_name):
     fig.add_trace(go.Scatter(
         x=data.index, y=data["Actual Price"],
         mode="lines", name="Actual Price",
-        line=dict(color="blue")
+        line=dict(color="green")
     ))
     fig.add_trace(go.Scatter(
         x=data.index, y=data["Predicted Price"],
