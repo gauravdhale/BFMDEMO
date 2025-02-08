@@ -152,10 +152,10 @@ st.markdown("## 📈 Market Trends")
 
 # First Row: BankNifty Trend, Selected Bank Trend, Profit vs Revenue
 with st.container():
-    st.subheader("BankNifty Trend")
     col1, col2, col3 = st.columns(3, gap="medium")
     
     with col1:
+        st.subheader("BankNifty Trend")
         if not bank_nifty_data.empty:
             fig1, ax1 = plt.subplots(figsize=(5, 3))
             ax1.plot(bank_nifty_data.index, bank_nifty_data['Close'], label="BankNifty Close", color='blue')
@@ -196,12 +196,7 @@ with st.container():
         ax_pr.legend()
         st.pyplot(fig_pr)
 
-# Second Row: Prediction vs Actual
-with st.container():
-    st.subheader("Prediction vs Actual")
-    plot_actual_vs_predicted(data, selected_stock)
-
-# Third Row: Nifty Bank Composition Heatmap, Correlation Matrix, BankNifty Index Data Table
+# Second Row: Nifty Bank Composition Heatmap, Correlation Matrix, BankNifty Index Data Table
 with st.container():
     col1, col2, col3 = st.columns(3, gap="medium")
     
@@ -238,6 +233,11 @@ with st.container():
                 st.dataframe(styled_df)
             else:
                 st.warning("No BankNifty data available.")
+
+# Third Row: Prediction vs Actual
+with st.container():
+    st.subheader("Prediction vs Actual")
+    plot_actual_vs_predicted(data, selected_stock)
 
 st.markdown("---")
 
