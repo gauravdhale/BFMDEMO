@@ -94,6 +94,17 @@ def plot_actual_vs_predicted(data, company_name):
     fig.update_layout(title=f"{company_name} - Actual vs Predicted Prices", xaxis_title="Date", yaxis_title="Price", hovermode="x unified")
     st.plotly_chart(fig)
 
+# **New Function to Plot Correlation Heatmap**
+def plot_correlation_heatmap(data, company_name):
+    if data.empty:
+        st.warning(f"No data available for {company_name} to compute correlation matrix.")
+        return
+    corr = data.corr()
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(corr, annot=True, cmap='coolwarm', fmt=".2f", linewidths=0.5)
+    plt.title(f"{company_name} - Correlation Matrix Heatmap")
+    st.pyplot(plt)
+
 # Fetch Data
 bank_nifty_data = fetch_stock_data(bank_nifty_ticker)
 selected_stock_data = fetch_stock_data(companies[selected_stock])
@@ -178,66 +189,32 @@ with col3:
 
             if 'Company' in df_heatmap.columns:
                 df_heatmap.set_index('Company', inplace=True)
+                if 'Weight(%)' in df_heatmap.columns:
+                    plt.figure(figsize=(6, 8))
+                    heatmap_data = df_heatmap[['Weight(%)']]
+                    sns.heatmap(heatmap_data, annot=True, cmap='YlGnBu', cbar=True)
+                    plt.title('Nifty Bank Composition Heatmap')
+                    plt.ylabel('Company')
+                    plt.xlabel('')
+                    plt.tight_layout()
+                    st.pyplot(plt)
+                else:
+                    st.write("Heatmap data not available.")
             else:
                 st.write("Error: 'Company' column not found in the CSV file.")
-            
-            if 'Weight(%)' in df_heatmap.columns:
-                plt.figure(figsize=(6,8))
-                heatmap_data = df_heatmap[['Weight(%)']]
-                sns.heatmap(heatmap_data, annot=True, cmap='YlGnBu', cbar=True)
-                plt.title('Nifty Bank Composition Heatmap')
-                plt.ylabel('Company')
-                plt.xlabel('')
-                plt.tight_layout()
-                st.pyplot(plt)
-            else:
-                st.write("Heatmap data not available.")
         except Exception as e:
             st.write(f"An error occurred: {e}")
     else:
         st.write("Please enter a valid GitHub URL.")
+
+    # **Add Correlation Matrix Heatmap**
+    st.subheader(f"📊 Correlation Matrix - {selected_stock}")
+    plot_correlation_heatmap(selected_stock_data, selected_stock)
 
     st.subheader("📋 BankNifty Index Data Table")
     if not bank_nifty_data.empty:
         st.dataframe(bank_nifty_data.tail(10).style.format({"Close": "{:.2f}", "Open": "{:.2f}", "High": "{:.2f}", "Low": "{:.2f}"}))
     else:
         st.warning("No BankNifty data available.")
-
-    st.subheader("📈 Correlation Matrix Heatmap")
-    # Correlation Matrix Heatmap
-   # Verify that data is not empty
-if not selected_stock_data.empty and not bank_nifty_data.empty:
-    # Align the indices
-    common_dates = selected_stock_data.index.intersection(bank_nifty_data.index)
-    selected_stock_close = selected_stock_data.loc[common_dates, 'Close']
-    bank_nifty_close = bank_nifty_data.loc[common_dates, 'Close']
-    
-    # Check if Series are not empty
-    if not selected_stock_close.empty and not bank_nifty_close.empty:
-        # Create combined DataFrame using concat
-        combined_data = pd.concat(
-            [
-                selected_stock_close.rename(f'{selected_stock} Close'),
-                bank_nifty_close.rename('BankNifty Close')
-            ], axis=1
-        ).dropna()
-        
-        # Check if combined_data is not empty
-        if not combined_data.empty:
-            # Compute correlation matrix
-            corr_matrix = combined_data.corr()
-        
-            # Plot correlation heatmap
-            fig_corr, ax_corr = plt.subplots()
-            sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', ax=ax_corr)
-            ax_corr.set_title(f'Correlation Matrix between {selected_stock} and BankNifty')
-            st.pyplot(fig_corr)
-        else:
-            st.warning("Combined data is empty after aligning dates and dropping NaNs.")
-    else:
-        st.warning("Selected stock or BankNifty close data is empty after alignment.")
-else:
-    st.warning("Insufficient data to generate correlation matrix.")
-
 
 st.success("🎯 Analysis Completed!")
