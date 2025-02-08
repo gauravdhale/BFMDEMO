@@ -212,24 +212,30 @@ if not selected_stock_data.empty and not bank_nifty_data.empty:
     selected_stock_close = selected_stock_data.loc[common_dates, 'Close']
     bank_nifty_close = bank_nifty_data.loc[common_dates, 'Close']
     
-    # Prepare data for correlation
-    combined_data = pd.DataFrame({
-        f'{selected_stock} Close': selected_stock_close,
-        'BankNifty Close': bank_nifty_close
-    }).dropna()
-    
-    # Check if combined_data is not empty
-    if not combined_data.empty:
-        # Compute correlation matrix
-        corr_matrix = combined_data.corr()
-    
-        # Plot correlation heatmap
-        fig_corr, ax_corr = plt.subplots()
-        sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', ax=ax_corr)
-        ax_corr.set_title(f'Correlation Matrix between {selected_stock} and BankNifty')
-        st.pyplot(fig_corr)
+    # Check if Series are not empty
+    if not selected_stock_close.empty and not bank_nifty_close.empty:
+        # Create combined DataFrame using concat
+        combined_data = pd.concat(
+            [
+                selected_stock_close.rename(f'{selected_stock} Close'),
+                bank_nifty_close.rename('BankNifty Close')
+            ], axis=1
+        ).dropna()
+        
+        # Check if combined_data is not empty
+        if not combined_data.empty:
+            # Compute correlation matrix
+            corr_matrix = combined_data.corr()
+        
+            # Plot correlation heatmap
+            fig_corr, ax_corr = plt.subplots()
+            sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', ax=ax_corr)
+            ax_corr.set_title(f'Correlation Matrix between {selected_stock} and BankNifty')
+            st.pyplot(fig_corr)
+        else:
+            st.warning("Combined data is empty after aligning dates and dropping NaNs.")
     else:
-        st.warning("Combined data is empty after aligning dates and dropping NaNs.")
+        st.warning("Selected stock or BankNifty close data is empty after alignment.")
 else:
     st.warning("Insufficient data to generate correlation matrix.")
 
