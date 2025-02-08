@@ -8,30 +8,6 @@ import requests
 from datetime import datetime
 import seaborn as sns
 
-# --- Custom CSS for Sidebar Font Size and Layout Optimization ---
-st.markdown(
-    """
-    <style>
-    /* Adjust sidebar font size */
-    [data-testid="stSidebar"] .css-1d391kg {
-        font-size: 12px;
-    }
-    /* Reduce padding around the main content */
-    .css-18e3th9 {
-        padding-top: 1rem;
-        padding-bottom: 1rem;
-        padding-left: 1rem;
-        padding-right: 1rem;
-    }
-    /* Reduce spacing between elements */
-    .main .block-container {
-        padding: 0rem 1rem;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
 # --- Streamlit Configuration ---
 st.set_page_config(page_title="Banking Sector Dashboard", layout="wide")
 st.title("📊 Banking Sector Financial Dashboard")
@@ -75,7 +51,7 @@ def fetch_stock_data(ticker, period="5y"):
         st.error(f"Error fetching data for {ticker}: {e}")
         return pd.DataFrame()
 
-# --- Function to Load Data from GitHub ---
+# --- Load Selected Data ---
 @st.cache_data
 def load_data(file_name):
     url = f"https://raw.githubusercontent.com/gauravdhale/BFMDEMO/main/{file_name}"
@@ -119,11 +95,11 @@ def plot_correlation_heatmap(data, company_name):
         st.warning(f"No data available for {company_name} to compute correlation matrix.")
         return
     corr = data.corr()
-    plt.figure(figsize=(5, 3))
-    sns.heatmap(corr, annot=True, cmap='coolwarm', fmt=".2f", linewidths=0.5)
-    plt.title(f"{company_name} - Correlation Matrix Heatmap")
+    fig, ax = plt.subplots(figsize=(5, 3))
+    sns.heatmap(corr, annot=True, cmap='coolwarm', fmt=".2f", linewidths=0.5, ax=ax)
+    ax.set_title(f"{company_name} - Correlation Matrix Heatmap")
     plt.tight_layout()
-    st.pyplot(plt)
+    st.pyplot(fig)
 
 # --- Fetch Data ---
 bank_nifty_data = fetch_stock_data(bank_nifty_ticker)
@@ -145,8 +121,17 @@ if not selected_stock_data.empty:
         "P/E Ratio": np.random.uniform(5, 30),
         "Dividend": np.random.uniform(1, 5)
     }
-    for label, value in metric_values.items():
-        st.sidebar.metric(label=label, value=f"{value:.2f}")
+    metrics = list(metric_values.items())
+    # Display metrics in two columns in the sidebar
+    col1, col2 = st.sidebar.columns(2)
+    for i in range(0, len(metrics), 2):
+        with col1:
+            label, value = metrics[i]
+            st.metric(label=label, value=f"{value:.2f}")
+        if i+1 < len(metrics):
+            with col2:
+                label, value = metrics[i+1]
+                st.metric(label=label, value=f"{value:.2f}")
 else:
     st.sidebar.warning(f"No stock data available for {selected_stock}.")
 
@@ -211,13 +196,12 @@ with row2_col2:
             df_heatmap = pd.read_csv(github_url, encoding='ISO-8859-1')
             if 'Company' in df_heatmap.columns and 'Weight(%)' in df_heatmap.columns:
                 df_heatmap.set_index('Company', inplace=True)
-                plt.figure(figsize=(5, 3))
+                fig_hm, ax_hm = plt.subplots(figsize=(5, 3))
                 heatmap_data = df_heatmap[['Weight(%)']]
-                sns.heatmap(heatmap_data, annot=True, cmap='YlGnBu', cbar=True, linewidths=0.5)
-                plt.title('Nifty Bank Composition')
-                plt.xlabel('')
+                sns.heatmap(heatmap_data, annot=True, cmap='YlGnBu', cbar=True, linewidths=0.5, ax=ax_hm)
+                ax_hm.set_title('Nifty Bank Composition')
                 plt.tight_layout()
-                st.pyplot(plt)
+                st.pyplot(fig_hm)
             else:
                 st.warning("Heatmap data not available.")
         except Exception as e:
