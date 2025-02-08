@@ -30,41 +30,56 @@ bank_nifty_ticker = "^NSEBANK"
 
 # Streamlit Configuration
 st.set_page_config(page_title="Banking Sector Dashboard", layout="wide")
-st.markdown("<style>div.block-container{padding-top:1rem;}</style>", unsafe_allow_html=True)
 
 # Custom CSS for styling
 st.markdown("""
     <style>
-    /* Sidebar adjustments */
-    [data-testid="stSidebar"] .css-1d391kg {  /* Adjust the sidebar font size */
-        font-size: 0.9rem;
-    }
-    /* Main content adjustments */
-    .stApp {
-        background-color: #f5f7fa;
-    }
-    /* Header styles */
-    h1, h2, h3, h4, h5, h6 {
-        color: #2E586D;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    /* Metric styles */
-    .metric-label > div {
+    /* Adjust sidebar */
+    [data-testid="stSidebar"] {
+        background-color: #f4f4f4;
         font-size: 0.8rem;
     }
-    .metric-value > div {
+    /* Adjust sidebar header */
+    [data-testid="stSidebar"] h1 {
         font-size: 1.2rem;
     }
-    /* Adjust dataframe font size */
+    /* Main content area */
+    .main {
+        background-color: #ffffff;
+    }
+    /* Header styles */
+    h1 {
+        color: #2E586D;
+        font-family: 'Helvetica Neue', sans-serif;
+    }
+    h2, h3 {
+        color: #2E586D;
+        font-family: 'Helvetica Neue', sans-serif;
+        margin-top: 1rem;
+    }
+    /* Adjustments for plots */
+    .plot-container {
+        padding: 0 !important;
+    }
+    /* Remove unnecessary whitespace */
+    .css-12oz5g7 {
+        padding-top: 0rem;
+        padding-bottom: 0rem;
+    }
+    /* Metric label and value */
+    .css-1wa3eu0 p {
+        font-size: 0.9rem;
+    }
+    /* DataFrame font size */
     .dataframe {
-        font-size: 0.8rem;
+        font-size: 0.8rem !important;
     }
     </style>
     """, unsafe_allow_html=True)
 
 # Title and Divider
 st.title("📊 Banking Sector Financial Dashboard")
-st.markdown("<hr style='border:1px solid #e0e0e0;margin-top:-10px;'>", unsafe_allow_html=True)
+st.markdown("---")
 
 # Sidebar Selection
 selected_stock = st.sidebar.selectbox("Select a Bank", list(companies.keys()))
@@ -117,9 +132,12 @@ def plot_actual_vs_predicted(data, company_name):
         x=data.index, y=data["Predicted Price"], mode="lines",
         name="Predicted Price", line=dict(color="#ff7f0e", dash="dash")))
     fig.update_layout(
-        title=f"{company_name} - Actual vs Predicted Prices",
-        xaxis_title="Date", yaxis_title="Price", hovermode="x unified", height=350,
-        margin=dict(l=20, r=20, t=50, b=20))
+        height=300,
+        margin=dict(l=20, r=20, t=40, b=20),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        plot_bgcolor="#FFFFFF",
+        paper_bgcolor="#FFFFFF"
+    )
     st.plotly_chart(fig, use_container_width=True)
 
 # Function to Plot Correlation Heatmap
@@ -133,6 +151,7 @@ def plot_correlation_heatmap(data, company_name):
     plt.title(f"{company_name} - Correlation Matrix", fontsize=12)
     plt.xticks(fontsize=8)
     plt.yticks(fontsize=8)
+    plt.tight_layout()
     st.pyplot(plt)
 
 # Fetch Data
@@ -156,14 +175,14 @@ if not selected_stock_data.empty:
         "Dividend": np.random.uniform(1, 5)
     }
     for label, value in metric_values.items():
-        st.sidebar.write(f"**{label}:** {value:.2f}")
+        st.sidebar.metric(label=label, value=f"{value:.2f}" if isinstance(value, (int, float)) else value)
 else:
     st.sidebar.warning(f"No stock data available for {selected_stock}.")
 
 # Layout Adjustments
 # First Row: Trends
 st.markdown("### Market Trends")
-row1_col1, row1_col2 = st.columns(2, gap="large")
+row1_col1, row1_col2 = st.columns([1, 1], gap="large")
 with row1_col1:
     st.subheader("BankNifty Trend")
     if not bank_nifty_data.empty:
@@ -172,8 +191,11 @@ with row1_col1:
             x=bank_nifty_data.index, y=bank_nifty_data['Close'], mode='lines',
             name='BankNifty Close', line=dict(color='#1f77b4')))
         fig.update_layout(
-            title='BankNifty Close Price', height=350,
-            margin=dict(l=20, r=20, t=50, b=20))
+            height=300,
+            margin=dict(l=20, r=20, t=40, b=20),
+            plot_bgcolor="#FFFFFF",
+            paper_bgcolor="#FFFFFF"
+        )
         st.plotly_chart(fig, use_container_width=True)
     else:
         st.warning("No data available for BankNifty.")
@@ -185,15 +207,18 @@ with row1_col2:
             x=selected_stock_data.index, y=selected_stock_data['Close'], mode='lines',
             name=f'{selected_stock} Close', line=dict(color='#2ca02c')))
         fig.update_layout(
-            title=f'{selected_stock} Close Price', height=350,
-            margin=dict(l=20, r=20, t=50, b=20))
+            height=300,
+            margin=dict(l=20, r=20, t=40, b=20),
+            plot_bgcolor="#FFFFFF",
+            paper_bgcolor="#FFFFFF"
+        )
         st.plotly_chart(fig, use_container_width=True)
     else:
         st.warning(f"No data available for {selected_stock}.")
 
 # Second Row: Prediction vs Actual and Correlation Heatmap
 st.markdown("### Analysis")
-row2_col1, row2_col2 = st.columns(2, gap="large")
+row2_col1, row2_col2 = st.columns([1, 1], gap="large")
 with row2_col1:
     st.subheader("Prediction vs Actual")
     plot_actual_vs_predicted(data, selected_stock)
@@ -203,7 +228,7 @@ with row2_col2:
 
 # Third Row: Profit vs Revenue and Heatmap
 st.markdown("### Financial Insights")
-row3_col1, row3_col2 = st.columns(2, gap="large")
+row3_col1, row3_col2 = st.columns([1, 1], gap="large")
 with row3_col1:
     st.subheader("Profit vs Revenue")
     profit_revenue_data = pd.DataFrame({
@@ -219,6 +244,7 @@ with row3_col1:
     ax_pr.tick_params(axis='x', labelrotation=0, labelsize=8)
     ax_pr.tick_params(axis='y', labelsize=8)
     ax_pr.legend(fontsize=8)
+    plt.tight_layout()
     st.pyplot(fig_pr)
 with row3_col2:
     st.subheader("Nifty Bank Composition")
@@ -233,6 +259,7 @@ with row3_col2:
                 plt.title('Nifty Bank Composition', fontsize=12)
                 plt.xticks(fontsize=8)
                 plt.yticks(fontsize=8)
+                plt.tight_layout()
                 st.pyplot(plt)
             else:
                 st.write("Heatmap data not available.")
@@ -254,4 +281,6 @@ with st.expander("BankNifty Index Data Table"):
     else:
         st.warning("No BankNifty data available.")
 
-st.success("Analysis Completed!")
+# Footer
+st.markdown("---")
+st.markdown("<p style='text-align: center; color: grey;'>© 2023 Banking Sector Dashboard</p>", unsafe_allow_html=True)
