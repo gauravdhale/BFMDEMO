@@ -150,12 +150,12 @@ else:
 # Layout Adjustments for Proper Alignment
 st.markdown("## 📈 Market Trends")
 
-# First Column: BankNifty Trend, Selected Bank Trend, Profit vs Revenue
+# First Row: BankNifty Trend, Selected Bank Trend, Profit vs Revenue
 with st.container():
+    st.subheader("BankNifty Trend")
     col1, col2, col3 = st.columns(3, gap="medium")
     
     with col1:
-        st.subheader("BankNifty Trend")
         if not bank_nifty_data.empty:
             fig1, ax1 = plt.subplots(figsize=(5, 3))
             ax1.plot(bank_nifty_data.index, bank_nifty_data['Close'], label="BankNifty Close", color='blue')
@@ -167,6 +167,7 @@ with st.container():
         else:
             st.warning("No data available for BankNifty.")
         
+    with col2:
         st.subheader(f"{selected_stock} Trend")
         if not selected_stock_data.empty:
             fig2, ax2 = plt.subplots(figsize=(5, 3))
@@ -179,6 +180,7 @@ with st.container():
         else:
             st.warning(f"No data available for {selected_stock}.")
         
+    with col3:
         st.subheader("Profit vs Revenue")
         profit_revenue_data = pd.DataFrame({
             "Year": np.arange(2015, 2025),
@@ -194,13 +196,16 @@ with st.container():
         ax_pr.legend()
         st.pyplot(fig_pr)
 
-# Second Column: Prediction vs Actual
-    with col2:
-        st.subheader("Prediction vs Actual")
-        plot_actual_vs_predicted(data, selected_stock)
+# Second Row: Prediction vs Actual
+with st.container():
+    st.subheader("Prediction vs Actual")
+    plot_actual_vs_predicted(data, selected_stock)
 
-# Third Column: Nifty Bank Composition Heatmap, Correlation Matrix, BankNifty Index Data Table
-    with col3:
+# Third Row: Nifty Bank Composition Heatmap, Correlation Matrix, BankNifty Index Data Table
+with st.container():
+    col1, col2, col3 = st.columns(3, gap="medium")
+    
+    with col1:
         st.subheader("Nifty Bank Composition Heatmap")
         github_url = "https://raw.githubusercontent.com/gauravdhale/BFMDEMO/main/heatmap.csv"
         try:
@@ -215,10 +220,12 @@ with st.container():
                 st.write("Heatmap data not available.")
         except Exception as e:
             st.write(f"An error occurred: {e}")
-
+            
+    with col2:
         st.subheader(f"Correlation Matrix - {selected_stock}")
         plot_correlation_heatmap(selected_stock_data, selected_stock)
-
+        
+    with col3:
         st.subheader("BankNifty Index Data Table")
         with st.expander("View Data Table"):
             if not bank_nifty_data.empty:
