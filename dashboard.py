@@ -166,7 +166,7 @@ with col2:
 
     st.pyplot(fig_pr)
 
-# Third Column: Heatmap and BankNifty Index Data Table
+# Third Column: Heatmaps and Data Table
 with col3:
     st.subheader("🔥 Nifty Bank Composition Heatmap")
 
@@ -202,5 +202,23 @@ with col3:
         st.dataframe(bank_nifty_data.tail(10).style.format({"Close": "{:.2f}", "Open": "{:.2f}", "High": "{:.2f}", "Low": "{:.2f}"}))
     else:
         st.warning("No BankNifty data available.")
+
+    st.subheader("📈 Correlation Matrix Heatmap")
+    # Correlation Matrix Heatmap
+    if not selected_stock_data.empty and not bank_nifty_data.empty:
+        # Prepare data for correlation
+        combined_data = pd.DataFrame({
+            f'{selected_stock} Close': selected_stock_data['Close'],
+            'BankNifty Close': bank_nifty_data['Close']
+        }).dropna()
+
+        corr_matrix = combined_data.corr()
+
+        fig_corr, ax_corr = plt.subplots()
+        sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', ax=ax_corr)
+        ax_corr.set_title(f'Correlation Matrix between {selected_stock} and BankNifty')
+        st.pyplot(fig_corr)
+    else:
+        st.warning("Insufficient data to generate correlation matrix.")
 
 st.success("🎯 Analysis Completed!")
