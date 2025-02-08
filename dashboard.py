@@ -117,8 +117,8 @@ def plot_correlation_heatmap(data, company_name):
         st.warning(f"No data available for {company_name} to compute correlation matrix.")
         return
     corr = data.corr()
-    fig, ax = plt.subplots(figsize=(6, 4))
-    sns.heatmap(corr, annot=True, cmap='coolwarm', fmt=".2f", linewidths=0.5, ax=ax)
+    fig, ax = plt.subplots(figsize=(10, 8))
+    sns.heatmap(corr, annot=True, cmap='coolwarm', vmin=0.35, vmax=1.00, linewidths=0.5, ax=ax)
     ax.set_title(f"{company_name} - Correlation Matrix Heatmap")
     st.pyplot(fig)
 
