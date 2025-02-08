@@ -205,20 +205,33 @@ with col3:
 
     st.subheader("📈 Correlation Matrix Heatmap")
     # Correlation Matrix Heatmap
-    if not selected_stock_data.empty and not bank_nifty_data.empty:
-        # Prepare data for correlation
-        combined_data = pd.DataFrame({
-            f'{selected_stock} Close': selected_stock_data['Close'],
-            'BankNifty Close': bank_nifty_data['Close']
-        }).dropna()
-
+   # Verify that data is not empty
+if not selected_stock_data.empty and not bank_nifty_data.empty:
+    # Align the indices
+    common_dates = selected_stock_data.index.intersection(bank_nifty_data.index)
+    selected_stock_close = selected_stock_data.loc[common_dates, 'Close']
+    bank_nifty_close = bank_nifty_data.loc[common_dates, 'Close']
+    
+    # Prepare data for correlation
+    combined_data = pd.DataFrame({
+        f'{selected_stock} Close': selected_stock_close,
+        'BankNifty Close': bank_nifty_close
+    }).dropna()
+    
+    # Check if combined_data is not empty
+    if not combined_data.empty:
+        # Compute correlation matrix
         corr_matrix = combined_data.corr()
-
+    
+        # Plot correlation heatmap
         fig_corr, ax_corr = plt.subplots()
         sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', ax=ax_corr)
         ax_corr.set_title(f'Correlation Matrix between {selected_stock} and BankNifty')
         st.pyplot(fig_corr)
     else:
-        st.warning("Insufficient data to generate correlation matrix.")
+        st.warning("Combined data is empty after aligning dates and dropping NaNs.")
+else:
+    st.warning("Insufficient data to generate correlation matrix.")
+
 
 st.success("🎯 Analysis Completed!")
