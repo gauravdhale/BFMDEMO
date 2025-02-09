@@ -285,4 +285,4 @@ with st.container():
 
 st.markdown("---")
 
-st.success("🎯 Analysis Completed!"
+st.success("🎯 Analysis Completed!")
