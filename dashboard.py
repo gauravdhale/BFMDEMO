@@ -50,6 +50,25 @@ def fetch_stock_data(ticker, period="5y"):
         st.error(f"Error fetching data for {ticker}: {e}")
         return pd.DataFrame()
 
+# Fetching all stock data for correlation heatmap
+all_stock_data = {name: fetch_stock_data(ticker) for name, ticker in companies.items()}
+# Debug print to check fetched data
+for name, data in all_stock_data.items():
+    if data.empty:
+        st.warning(f"No data available for {name} (Ticker: {companies[name]}).")
+    else:
+        st.write(f"Data for {name} (Ticker: {companies[name]}):")
+        st.write(data.head())  # Display the first few rows of each stock data
+
+closing_prices = pd.DataFrame({name: data["Close"] for name, data in all_stock_data.items() if not data.empty})
+
+if not closing_prices.empty:
+    correlation_matrix = closing_prices.corr()
+    st.subheader("Correlation Heatmap of Banking Stocks")
+    plot_heatmap(correlation_matrix)
+else:
+    st.warning("Not enough data for correlation analysis.")
+
 # Function to get the list of CSV files from GitHub
 @st.cache_data
 def get_csv_files():
