@@ -123,11 +123,35 @@ def plot_heatmap(correlation_matrix):
     sns.heatmap(correlation_matrix, annot=True, cmap="coolwarm", fmt=".2f", ax=ax)
     st.pyplot(fig)
 
-st.set_page_config(page_title="Banking Sector Dashboard", layout="wide")
-
-# Fetch Data
+# Rest of Your Code
+# Define Variables and Load Data
+bank_nifty_ticker = "^NSEBANK"
 bank_nifty_data = fetch_stock_data(bank_nifty_ticker)
+
+# Define your companies and other variables
+companies = {
+    "HDFC Bank": "HDFCBANK.NS",
+    "ICICI Bank": "ICICIBANK.NS",
+    # Add other companies as needed
+}
+selected_stock = "HDFC Bank"  # Or use a method to select the stock
 selected_stock_data = fetch_stock_data(companies[selected_stock])
+
+csv_files = {
+    "HDFC Bank": "hdfc_data.csv",
+    "ICICI Bank": "icici_data.csv",
+    # Add other mappings as needed
+}
+
+def load_data(file_path):
+    try:
+        data = pd.read_csv(file_path)
+        data.set_index(pd.to_datetime(data['Date']), inplace=True)
+        return data
+    except Exception as e:
+        st.error(f"Error loading data: {e}")
+        return pd.DataFrame()
+
 selected_file = csv_files.get(selected_stock)
 data = load_data(selected_file)
 
@@ -146,7 +170,7 @@ if not selected_stock_data.empty:
         "Dividend": np.random.uniform(1, 5)
     }
     for label, value in metric_values.items():
-        st.sidebar.metric(label=label, value=f"{value:.2f}" if isinstance(value, (int, float)) else value)
+        st.sidebar.metric(label=label, value=f"{value:.2f}")
 else:
     st.sidebar.warning(f"No stock data available for {selected_stock}.")
 
@@ -221,9 +245,18 @@ with st.container():
                 
     with col2:
         st.subheader("Correlation Heatmap of Banking Stocks")
+        # Define your banking stocks
+        banking_stocks = {
+            "HDFC Bank": "HDFCBANK.NS",
+            "ICICI Bank": "ICICIBANK.NS",
+            "State Bank of India": "SBIN.NS",
+            # Add other banks as needed
+        }
         # Fetching all stock data for correlation heatmap
         all_stock_data = {name: fetch_stock_data(ticker) for name, ticker in banking_stocks.items()}
-        closing_prices = pd.DataFrame({name: data["Close"] for name, data in all_stock_data.items() if not data.empty})
+        closing_prices = pd.DataFrame({
+            name: data["Close"] for name, data in all_stock_data.items() if not data.empty
+        })
         
         if not closing_prices.empty:
             correlation_matrix = closing_prices.corr()
@@ -252,4 +285,4 @@ with st.container():
 
 st.markdown("---")
 
-st.success("🎯 Analysis Completed!")
+st.success("🎯 Analysis Completed!"
