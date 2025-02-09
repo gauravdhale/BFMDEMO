@@ -113,6 +113,11 @@ def plot_actual_vs_predicted(data, company_name):
 
 # Fetching all stock data for correlation heatmap
 all_stock_data = {name: fetch_stock_data(ticker) for name, ticker in companies.items()}
+# Debug print to check fetched data
+for name, data in all_stock_data.items():
+    print(f"Data for {name} (Ticker: {companies[name]}):")
+    print(data.head())  # Print the first few rows of each stock data
+
 closing_prices = pd.DataFrame({name: data["Close"] for name, data in all_stock_data.items() if not data.empty})
 
 if not closing_prices.empty:
@@ -121,7 +126,6 @@ if not closing_prices.empty:
     plot_heatmap(correlation_matrix)
 else:
     st.warning("Not enough data for correlation analysis.")
-
 
 # Original code integration with new function
 def plot_correlation_heatmap(data, company_name):
