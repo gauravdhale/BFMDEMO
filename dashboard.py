@@ -111,16 +111,24 @@ def plot_actual_vs_predicted(data, company_name):
     )
     st.plotly_chart(fig, use_container_width=True)
 
-# Function to Plot Correlation Heatmap
+# Fetching all stock data for correlation heatmap
+all_stock_data = {name: fetch_stock_data(ticker) for name, ticker in banking_stocks.items()}
+closing_prices = pd.DataFrame({name: data["Close"] for name, data in all_stock_data.items() if not data.empty})
+
+if not closing_prices.empty:
+    correlation_matrix = closing_prices.corr()
+    st.subheader("Correlation Heatmap of Banking Stocks")
+    plot_heatmap(correlation_matrix)
+else:
+    st.warning("Not enough data for correlation analysis.")
+
+# Original code integration with new function
 def plot_correlation_heatmap(data, company_name):
     if data.empty:
         st.warning(f"No data available for {company_name} to compute correlation matrix.")
         return
     corr = data.corr()
-    fig, ax = plt.subplots(figsize=(10, 8))
-    sns.heatmap(corr, annot=True, cmap='coolwarm', vmin=0.35, vmax=1.00, linewidths=0.5, ax=ax)
-    ax.set_title(f"{company_name} - Correlation Matrix Heatmap")
-    st.pyplot(fig)
+    plot_heatmap(corr)
 
 # Fetch Data
 bank_nifty_data = fetch_stock_data(bank_nifty_ticker)
@@ -217,8 +225,8 @@ with st.container():
             st.write(f"An error occurred: {e}")
             
     with col2:
-        st.subheader(f"Correlation Matrix - {selected_stock}")
-        plot_correlation_heatmap(selected_stock_data, selected_stock)
+        st.subheader(f"Correlation Matrix - Selected Stock")
+        plot_correlation_heatmap(selected_stock_data, "Selected Stock")
         
     with col3:
         st.subheader("BankNifty Index Data Table")
