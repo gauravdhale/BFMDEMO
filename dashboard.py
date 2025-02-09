@@ -111,47 +111,15 @@ def plot_actual_vs_predicted(data, company_name):
     )
     st.plotly_chart(fig, use_container_width=True)
 
-# Function to Fetch Stock Data
-def fetch_stock_data(ticker, period="5y"):
-    stock = yf.Ticker(ticker)
-    data = stock.history(period=period)
-    return data
-
 # Function to Plot Correlation Heatmap
 def plot_heatmap(correlation_matrix):
     fig, ax = plt.subplots(figsize=(8, 6))
     sns.heatmap(correlation_matrix, annot=True, cmap="coolwarm", fmt=".2f", ax=ax)
     st.pyplot(fig)
 
-# Rest of Your Code
-# Define Variables and Load Data
-bank_nifty_ticker = "^NSEBANK"
+# Fetch Data
 bank_nifty_data = fetch_stock_data(bank_nifty_ticker)
-
-# Define your companies and other variables
-companies = {
-    "HDFC Bank": "HDFCBANK.NS",
-    "ICICI Bank": "ICICIBANK.NS",
-    # Add other companies as needed
-}
-selected_stock = "HDFC Bank"  # Or use a method to select the stock
 selected_stock_data = fetch_stock_data(companies[selected_stock])
-
-csv_files = {
-    "HDFC Bank": "hdfc_data.csv",
-    "ICICI Bank": "icici_data.csv",
-    # Add other mappings as needed
-}
-
-def load_data(file_path):
-    try:
-        data = pd.read_csv(file_path)
-        data.set_index(pd.to_datetime(data['Date']), inplace=True)
-        return data
-    except Exception as e:
-        st.error(f"Error loading data: {e}")
-        return pd.DataFrame()
-
 selected_file = csv_files.get(selected_stock)
 data = load_data(selected_file)
 
@@ -170,7 +138,7 @@ if not selected_stock_data.empty:
         "Dividend": np.random.uniform(1, 5)
     }
     for label, value in metric_values.items():
-        st.sidebar.metric(label=label, value=f"{value:.2f}")
+        st.sidebar.metric(label=label, value=f"{value:.2f}" if isinstance(value, (int, float)) else value)
 else:
     st.sidebar.warning(f"No stock data available for {selected_stock}.")
 
@@ -242,9 +210,9 @@ with st.container():
                 st.write("Heatmap data not available.")
         except Exception as e:
             st.write(f"An error occurred: {e}")
-                
+            
     with col2:
-        st.subheader("Correlation Heatmap of Banking Stocks")
+       st.subheader("Correlation Heatmap of Banking Stocks")
         # Define your banking stocks
         banking_stocks = {
             "HDFC Bank": "HDFCBANK.NS",
