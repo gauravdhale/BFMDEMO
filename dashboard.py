@@ -224,10 +224,15 @@ with st.container():
         }
         # Fetching all stock data for correlation heatmap
         all_stock_data = {name: fetch_stock_data(ticker) for name, ticker in banking_stocks.items()}
+        # Ensure all data has the same date range
+        min_length = min(len(data) for data in all_stock_data.values() if not data.empty)
+        for name in all_stock_data.keys():
+            all_stock_data[name] = all_stock_data[name].iloc[:min_length]
+
         closing_prices = pd.DataFrame({
             name: data["Close"] for name, data in all_stock_data.items() if not data.empty
         })
-        
+
         if not closing_prices.empty:
             correlation_matrix = closing_prices.corr()
             plot_heatmap(correlation_matrix)
