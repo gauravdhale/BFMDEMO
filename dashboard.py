@@ -210,20 +210,20 @@ with st.container():
                 st.write("Heatmap data not available.")
         except Exception as e:
             st.write(f"An error occurred: {e}")
-                
+            
     with col2:
-        st.subheader("Correlation Heatmap of Banking Stocks")
+        st.subheader("Correlation Matrix - Banking Stocks")
         # Define your banking stocks
         banking_stocks = {
             "HDFC Bank": "HDFCBANK.NS",
             "ICICI Bank": "ICICIBANK.NS",
             "State Bank of India": "SBIN.NS",
-            # Add other banks as needed
+            "Kotak Mahindra Bank": "KOTAKBANK.NS",
+            "Axis Bank": "AXISBANK.NS",
+            "Bank of Baroda": "BANKBARODA.NS"
         }
         # Fetching all stock data for correlation heatmap
-        all_stock_data = {
-            name: fetch_stock_data(ticker) for name, ticker in banking_stocks.items()
-        }
+        all_stock_data = {name: fetch_stock_data(ticker) for name, ticker in banking_stocks.items()}
         closing_prices = pd.DataFrame({
             name: data["Close"] for name, data in all_stock_data.items() if not data.empty
         })
