@@ -50,25 +50,6 @@ def fetch_stock_data(ticker, period="5y"):
         st.error(f"Error fetching data for {ticker}: {e}")
         return pd.DataFrame()
 
-# Fetching all stock data for correlation heatmap
-all_stock_data = {name: fetch_stock_data(ticker) for name, ticker in companies.items()}
-# Debug print to check fetched data
-for name, data in all_stock_data.items():
-    if data.empty:
-        st.warning(f"No data available for {name} (Ticker: {companies[name]}).")
-    else:
-        st.write(f"Data for {name} (Ticker: {companies[name]}):")
-        st.write(data.head())  # Display the first few rows of each stock data
-
-closing_prices = pd.DataFrame({name: data["Close"] for name, data in all_stock_data.items() if not data.empty})
-
-if not closing_prices.empty:
-    correlation_matrix = closing_prices.corr()
-    st.subheader("Correlation Heatmap of Banking Stocks")
-    plot_heatmap(correlation_matrix)
-else:
-    st.warning("Not enough data for correlation analysis.")
-
 # Function to get the list of CSV files from GitHub
 @st.cache_data
 def get_csv_files():
@@ -130,29 +111,16 @@ def plot_actual_vs_predicted(data, company_name):
     )
     st.plotly_chart(fig, use_container_width=True)
 
-# Fetching all stock data for correlation heatmap
-all_stock_data = {name: fetch_stock_data(ticker) for name, ticker in companies.items()}
-# Debug print to check fetched data
-for name, data in all_stock_data.items():
-    print(f"Data for {name} (Ticker: {companies[name]}):")
-    print(data.head())  # Print the first few rows of each stock data
-
-closing_prices = pd.DataFrame({name: data["Close"] for name, data in all_stock_data.items() if not data.empty})
-
-if not closing_prices.empty:
-    correlation_matrix = closing_prices.corr()
-    st.subheader("Correlation Heatmap of Banking Stocks")
-    plot_heatmap(correlation_matrix)
-else:
-    st.warning("Not enough data for correlation analysis.")
-
-# Original code integration with new function
+# Function to Plot Correlation Heatmap
 def plot_correlation_heatmap(data, company_name):
     if data.empty:
         st.warning(f"No data available for {company_name} to compute correlation matrix.")
         return
     corr = data.corr()
-    plot_heatmap(corr)
+    fig, ax = plt.subplots(figsize=(10, 8))
+    sns.heatmap(corr, annot=True, cmap='coolwarm', vmin=0.35, vmax=1.00, linewidths=0.5, ax=ax)
+    ax.set_title(f"{company_name} - Correlation Matrix Heatmap")
+    st.pyplot(fig)
 
 # Fetch Data
 bank_nifty_data = fetch_stock_data(bank_nifty_ticker)
@@ -249,8 +217,8 @@ with st.container():
             st.write(f"An error occurred: {e}")
             
     with col2:
-        st.subheader(f"Correlation Matrix - Selected Stock")
-        plot_correlation_heatmap(selected_stock_data, "Selected Stock")
+        st.subheader(f"Correlation Matrix - {selected_stock}")
+        plot_correlation_heatmap(selected_stock_data, selected_stock)
         
     with col3:
         st.subheader("BankNifty Index Data Table")
