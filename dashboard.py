@@ -246,7 +246,7 @@ with st.container():
                 })
                 st.dataframe(styled_df)
             else:
-                st.warning("No BankNifty data available."
+                st.warning("No BankNifty data available.")
 
 # Third Row: Prediction vs Actual
 with st.container():
