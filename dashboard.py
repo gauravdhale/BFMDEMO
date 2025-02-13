@@ -101,30 +101,23 @@ def plot_actual_vs_predicted(data, company_name):
         mode="lines", name="Predicted Price",
         line=dict(color="blue", dash="dash")
     ))
+    fig.add_trace(go.Scatter(
+        x=data.index, y=data["% Error"],
+        mode="lines", name="% Error",
+        line=dict(color="red", dash="dot")
+    ))
+    
     fig.update_layout(
-        title=f"{company_name} - Actual vs Predicted Prices",
+        title=f"{company_name} - Actual vs Predicted Prices with % Error",
         xaxis_title="Date",
         yaxis_title="Price",
         hovermode="x unified",
         height=350,
         margin=dict(l=40, r=40, t=60, b=40),
         template="plotly_white",
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-        yaxis2=dict(
-            title="% Error",
-            overlaying="y",
-            side="right",
-            tickformat=".2f%"
-        )
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
     )
-    
-    fig.add_trace(go.Scatter(
-        x=data.index, y=data["% Error"],
-        mode="lines", name="% Error",
-        line=dict(color="red"),
-        yaxis="y2"
-    ))
-    
+
     st.plotly_chart(fig, use_container_width=True)
 # Function to Plot Correlation Heatmap
 def plot_correlation_heatmap(data, company_name):
