@@ -18,15 +18,6 @@ companies = {
     'Bank of Baroda': 'BANKBARODA.NS'
 }
 
-tickers = {
-    "HDFC Bank": "HDFCBANK.NS",
-    "Kotak Mahindra Bank": "KOTAKBANK.NS",
-    "Bank of Baroda": "BANKBARODA.NS",
-    "Axis Bank": "AXISBANK.NS",
-    "State Bank of India": "SBIN.NS",
-    "ICICI Bank": "ICICIBANK.NS"
-}
-
 csv_files = {
     'HDFC Bank': 'HDFCBANK.csv',
     'ICICI Bank': 'ICICI_BANK.csv',
@@ -35,6 +26,7 @@ csv_files = {
     'Axis Bank': 'AXIS.csv',
     'Bank of Baroda': 'BARODA.csv'
 }
+
 bank_nifty_ticker = "^NSEBANK"
 
 # Streamlit Configuration
@@ -42,9 +34,8 @@ st.set_page_config(page_title="Banking Sector Dashboard", layout="wide")
 st.title("📊 Banking Sector Financial Dashboard")
 st.markdown("---")
 
-# Selection Dropdown
-selected_stock = st.sidebar.selectbox("🔍 Select a Bank", list(companies.keys()))
-selected_bank = st.sidebar.selectbox("🏦 Select a Bank", list(tickers.keys()))
+# Single Selection Dropdown
+selected_bank = st.sidebar.selectbox("🏦 Select a Bank", list(companies.keys()))
 
 # Function to Fetch Stock Data
 def fetch_stock_data(ticker, period="5y"):
@@ -129,6 +120,7 @@ def plot_actual_vs_predicted(data, company_name):
     )
 
     st.plotly_chart(fig, use_container_width=True)
+
 # Function to Plot Correlation Heatmap
 def plot_correlation_heatmap(data, company_name):
     if data.empty:
@@ -174,18 +166,21 @@ def get_stock_data(tickers):
 
 # Fetch Data
 bank_nifty_data = fetch_stock_data(bank_nifty_ticker)
-selected_stock_data = fetch_stock_data(companies[selected_stock])
-selected_file = csv_files.get(selected_stock)
+selected_stock_data = fetch_stock_data(companies[selected_bank])
+selected_file = csv_files.get(selected_bank)
 data = load_data(selected_file)
 
-data = get_stock_data([tickers[selected_bank]])
-ticker = tickers[selected_bank]
+# Get Stock Metrics
+ticker = companies[selected_bank]
+stock_data = get_stock_data([ticker])
+
+# Display Stock Metrics in Sidebar
 st.sidebar.header("📌 Key Metrics")
 st.sidebar.subheader(selected_bank)
-for key, value in data[ticker].items():
-    st.sidebar.write(f"{key}:** {value}")
-# Display Metrics if Data is Available
-st.sidebar.header("📌 Key Metrics")
+for key, value in stock_data[ticker].items():
+    st.sidebar.write(f"{key}: {value}")
+
+# Display Additional Metrics if Data is Available
 if not selected_stock_data.empty:
     latest_data = selected_stock_data.iloc[-1]
     metric_values = {
@@ -201,7 +196,7 @@ if not selected_stock_data.empty:
     for label, value in metric_values.items():
         st.sidebar.metric(label=label, value=f"{value:.2f}" if isinstance(value, (int, float)) else value)
 else:
-    st.sidebar.warning(f"No stock data available for {selected_stock}.")
+    st.sidebar.warning(
 
 # Layout Adjustments for Proper Alignment
 st.markdown("## 📈 Market Trends")
