@@ -18,7 +18,7 @@ companies = {
     'Bank of Baroda': 'BANKBARODA.NS'
 }
 
-companies = {
+tickers = {
     "HDFC Bank": "HDFCBANK.NS",
     "Kotak Mahindra Bank": "KOTAKBANK.NS",
     "Bank of Baroda": "BANKBARODA.NS",
@@ -44,7 +44,7 @@ st.markdown("---")
 
 # Selection Dropdown
 selected_stock = st.sidebar.selectbox("🔍 Select a Bank", list(companies.keys()))
-selected_stock = st.sidebar.selectbox("🏦 Select a Bank", list(companies.keys()))
+selected_bank = st.sidebar.selectbox("🏦 Select a Bank", list(tickers.keys()))
 
 # Function to Fetch Stock Data
 def fetch_stock_data(ticker, period="5y"):
@@ -149,9 +149,9 @@ def format_market_cap(value):
         return f"{value / 1e6:.2f}M"
     return str(value)
 
-def get_stock_data(companies):
+def get_stock_data(tickers):
     data = {}
-    for ticker in companies:
+    for ticker in tickers:
         stock = yf.Ticker(ticker)
         info = stock.info
         data[ticker] = {
@@ -178,12 +178,12 @@ selected_stock_data = fetch_stock_data(companies[selected_stock])
 selected_file = csv_files.get(selected_stock)
 data = load_data(selected_file)
 
-data = get_stock_data([companies[selected_bank]])
-ticker = companies[selected_bank]
+data = get_stock_data([tickers[selected_bank]])
+ticker = tickers[selected_bank]
 st.sidebar.header("📌 Key Metrics")
 st.sidebar.subheader(selected_bank)
 for key, value in data[ticker].items():
-    st.sidebar.write(f"**{key}:** {value}")
+    st.sidebar.write(f"{key}:** {value}")
 # Display Metrics if Data is Available
 st.sidebar.header("📌 Key Metrics")
 if not selected_stock_data.empty:
