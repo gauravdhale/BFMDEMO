@@ -196,7 +196,7 @@ if not selected_stock_data.empty:
     for label, value in metric_values.items():
         st.sidebar.metric(label=label, value=f"{value:.2f}" if isinstance(value, (int, float)) else value)
 else:
-    st.sidebar.warning(
+    st.sidebar.warning(f"No stock data available for {selected_bank}.")
 
 # Layout Adjustments for Proper Alignment
 st.markdown("## 📈 Market Trends")
