@@ -145,9 +145,8 @@ if not selected_stock_data.empty:
         "Close": latest_data["Close"],
         "High": latest_data["High"],
         "Low": latest_data["Low"],
-        "EPS": np.random.uniform(10, 50),
-        "IPO Price": np.random.uniform(200, 1000),
-        "P/E Ratio": np.random.uniform(5, 30),
+        "EPS": latest_data["EPS"],
+        "P/E Ratio":  latest_data["EPS"],
         "Dividend": np.random.uniform(1, 5)
     }
     for label, value in metric_values.items():
