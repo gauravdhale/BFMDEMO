@@ -198,6 +198,17 @@ if not selected_stock_data.empty:
 else:
     st.sidebar.warning(f"No stock data available for {selected_bank}.")
 
+# Display Selected Bank Trend Subheader
+st.subheader(f"{selected_bank} Trend")
+
+# Plot selected bank data
+fig, ax = plt.subplots()
+ax.plot(selected_stock_data.index, selected_stock_data['Close'], label=f"{selected_bank} Close", color='red')
+ax.set_title(f"{selected_bank} Stock Price Trend")
+ax.set_xlabel('Date')
+ax.set_ylabel('Close Price')
+ax.legend()
+st.pyplot(fig)
 # Layout Adjustments for Proper Alignment
 st.markdown("## 📈 Market Trends")
 
