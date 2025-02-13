@@ -138,21 +138,32 @@ data = load_data(selected_file)
 
 # Display Metrics if Data is Available
 st.sidebar.header("📌 Key Metrics")
+
+# Replace 'selected_stock' with the ticker symbol of the stock you're interested in
+selected_stock = 'AAPL'
+
+# Fetch stock data from yfinance
+selected_stock_data = yf.download(selected_stock, period='1d')
+
 if not selected_stock_data.empty:
     latest_data = selected_stock_data.iloc[-1]
+    ticker = yf.Ticker(selected_stock)
+
     metric_values = {
         "Open": latest_data["Open"],
         "Close": latest_data["Close"],
         "High": latest_data["High"],
         "Low": latest_data["Low"],
-        "EPS": latest_data["EPS (TTM)"],
-        "P/E Ratio":  latest_data["EPS"],
-        "Dividend": np.random.uniform(1, 5)
+        "EPS (TTM)": ticker.info['trailingEps'],
+        "P/E Ratio": ticker.info['trailingPE'],
+        "Dividend": ticker.info['dividendYield'] * 100  # Converted to percentage
     }
+
     for label, value in metric_values.items():
         st.sidebar.metric(label=label, value=f"{value:.2f}" if isinstance(value, (int, float)) else value)
 else:
     st.sidebar.warning(f"No stock data available for {selected_stock}.")
+
 
 
 
