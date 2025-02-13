@@ -70,7 +70,7 @@ def load_data(file_name):
         st.write(f"Loading data from: {url}")
         df = pd.read_csv(url)
         df.columns = df.columns.str.strip()
-        df.rename(columns={"Open": "Actual Price", "Predicted_Open": "Predicted Price"}, inplace=True)
+        df.rename(columns={"Open": "Actual Price", "Predicted_Open": "Predicted Price", "%_error":"Error %"}, inplace=True)
         df["Date"] = pd.to_datetime(df["Date"], format="%d-%m-%Y", dayfirst=True, errors="coerce")
         df.set_index("Date", inplace=True)
         return df
