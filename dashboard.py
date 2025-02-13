@@ -78,16 +78,18 @@ def load_data(file_name):
         st.error(f"Error reading {file_name}: {e}")
         return pd.DataFrame()
 
-# Function to Plot Actual vs Predicted Prices
+# Function to Plot Actual vs Predicted Prices with % Error
 def plot_actual_vs_predicted(data, company_name):
     if data.empty:
         st.warning(f"No data available for {company_name}.")
         return
-    required_columns = ["Actual Price", "Predicted Price"]
+
+    required_columns = ["Actual Price", "Predicted Price", "% Error"]
     missing_columns = [col for col in required_columns if col not in data.columns]
     if missing_columns:
         st.error(f"⚠ Missing columns in CSV: {missing_columns}")
         return
+
     fig = go.Figure()
     fig.add_trace(go.Scatter(
         x=data.index, y=data["Actual Price"],
@@ -107,10 +109,23 @@ def plot_actual_vs_predicted(data, company_name):
         height=350,
         margin=dict(l=40, r=40, t=60, b=40),
         template="plotly_white",
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        yaxis2=dict(
+            title="% Error",
+            overlaying="y",
+            side="right",
+            tickformat=".2f%"
+        )
     )
+    
+    fig.add_trace(go.Scatter(
+        x=data.index, y=data["% Error"],
+        mode="lines", name="% Error",
+        line=dict(color="red"),
+        yaxis="y2"
+    ))
+    
     st.plotly_chart(fig, use_container_width=True)
-
 # Function to Plot Correlation Heatmap
 def plot_correlation_heatmap(data, company_name):
     if data.empty:
