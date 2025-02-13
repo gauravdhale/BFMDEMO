@@ -219,7 +219,7 @@ with st.container():
             st.warning("No data available for BankNifty.")
         
     with col2:
-        st.subheader(f"{selected_stock} Trend")
+        st.subheader(f"{selected_bank} Trend")
         if not selected_stock_data.empty:
             fig2, ax2 = plt.subplots(figsize=(5, 3))
             ax2.plot(selected_stock_data.index, selected_stock_data['Close'], label=f"{selected_stock} Close", color='red')
