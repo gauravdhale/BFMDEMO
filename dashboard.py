@@ -145,7 +145,7 @@ if not selected_stock_data.empty:
         "Close": latest_data["Close"],
         "High": latest_data["High"],
         "Low": latest_data["Low"],
-        "EPS": latest_data["EPS"],
+        "EPS": latest_data["EPS (TTM)"],
         "P/E Ratio":  latest_data["EPS"],
         "Dividend": np.random.uniform(1, 5)
     }
