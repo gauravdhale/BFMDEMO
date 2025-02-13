@@ -84,7 +84,7 @@ def plot_actual_vs_predicted(data, company_name):
         st.warning(f"No data available for {company_name}.")
         return
 
-    required_columns = ["Actual Price", "Predicted Price", "% Error"]
+    required_columns = ["Actual Price", "Predicted Price", "Error %"]
     missing_columns = [col for col in required_columns if col not in data.columns]
     if missing_columns:
         st.error(f"⚠ Missing columns in CSV: {missing_columns}")
