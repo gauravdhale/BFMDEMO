@@ -78,8 +78,8 @@ def load_data(file_name):
         st.error(f"Error reading {file_name}: {e}")
         return pd.DataFrame()
 
-# Function to Plot Actual vs Predicted Prices with MAE
-def plot_actual_vs_predicted(data, company_name, model_name="Linear Regression"):
+# Function to Plot Actual vs Predicted Prices
+def plot_actual_vs_predicted(data, company_name):
     if data.empty:
         st.warning(f"No data available for {company_name}.")
         return
@@ -88,10 +88,6 @@ def plot_actual_vs_predicted(data, company_name, model_name="Linear Regression")
     if missing_columns:
         st.error(f"⚠ Missing columns in CSV: {missing_columns}")
         return
-
-    # Calculate Mean Absolute Error (MAE)
-    mae = np.mean(np.abs(data["Actual Price"] - data["Predicted Price"]))
-    
     fig = go.Figure()
     fig.add_trace(go.Scatter(
         x=data.index, y=data["Actual Price"],
@@ -104,7 +100,7 @@ def plot_actual_vs_predicted(data, company_name, model_name="Linear Regression")
         line=dict(color="blue", dash="dash")
     ))
     fig.update_layout(
-        title=f"{company_name} - Actual vs Predicted Prices (MAE: {mae:.2f})",
+        title=f"{company_name} - Actual vs Predicted Prices",
         xaxis_title="Date",
         yaxis_title="Price",
         hovermode="x unified",
@@ -113,10 +109,8 @@ def plot_actual_vs_predicted(data, company_name, model_name="Linear Regression")
         template="plotly_white",
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
     )
-
-    # Add model information
-    st.write(f"**Model Used for Prediction:** {model_name}")
     st.plotly_chart(fig, use_container_width=True)
+
 # Function to Plot Correlation Heatmap
 def plot_correlation_heatmap(data, company_name):
     if data.empty:
