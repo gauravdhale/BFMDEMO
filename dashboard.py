@@ -70,7 +70,7 @@ def load_data(file_name):
         st.write(f"Loading data from: {url}")
         df = pd.read_csv(url)
         df.columns = df.columns.str.strip()
-        df.rename(columns={"Open": "Actual Price", "Predicted_Open": "Predicted Price", "%_error":"Error %"}, inplace=True)
+        df.rename(columns={"Open": "Actual Price", "Predicted_Open": "Predicted Price", "%_error": "% Error"}, inplace=True)
         df["Date"] = pd.to_datetime(df["Date"], format="%d-%m-%Y", dayfirst=True, errors="coerce")
         df.set_index("Date", inplace=True)
         return df
@@ -84,7 +84,7 @@ def plot_actual_vs_predicted(data, company_name):
         st.warning(f"No data available for {company_name}.")
         return
 
-    required_columns = ["Actual Price", "Predicted Price", "Error %"]
+    required_columns = ["Actual Price", "Predicted Price", "% Error"]
     missing_columns = [col for col in required_columns if col not in data.columns]
     if missing_columns:
         st.error(f"⚠ Missing columns in CSV: {missing_columns}")
