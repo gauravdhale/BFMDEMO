@@ -18,6 +18,15 @@ companies = {
     'Bank of Baroda': 'BANKBARODA.NS'
 }
 
+tickers = {
+    "HDFC Bank": "HDFCBANK.NS",
+    "Kotak Mahindra Bank": "KOTAKBANK.NS",
+    "Bank of Baroda": "BANKBARODA.NS",
+    "Axis Bank": "AXISBANK.NS",
+    "State Bank of India": "SBIN.NS",
+    "ICICI Bank": "ICICIBANK.NS"
+}
+
 csv_files = {
     'HDFC Bank': 'HDFCBANK.csv',
     'ICICI Bank': 'ICICI_BANK.csv',
@@ -35,6 +44,7 @@ st.markdown("---")
 
 # Selection Dropdown
 selected_stock = st.sidebar.selectbox("🔍 Select a Bank", list(companies.keys()))
+selected_bank = st.sidebar.selectbox("🏦 Select a Bank", list(tickers.keys()))
 
 # Function to Fetch Stock Data
 def fetch_stock_data(ticker, period="5y"):
@@ -130,12 +140,50 @@ def plot_correlation_heatmap(data, company_name):
     ax.set_title(f"{company_name} - Correlation Matrix Heatmap")
     st.pyplot(fig)
 
+def format_market_cap(value):
+    if value >= 1e12:
+        return f"{value / 1e12:.2f}T"
+    elif value >= 1e9:
+        return f"{value / 1e9:.2f}B"
+    elif value >= 1e6:
+        return f"{value / 1e6:.2f}M"
+    return str(value)
+
+def get_stock_data(tickers):
+    data = {}
+    for ticker in tickers:
+        stock = yf.Ticker(ticker)
+        info = stock.info
+        data[ticker] = {
+            "Open": info.get("open", "N/A"),
+            "Close": info.get("previousClose", "N/A"),
+            "High": info.get("dayHigh", "N/A"),
+            "Low": info.get("dayLow", "N/A"),
+            "Market Cap": format_market_cap(info.get("marketCap", "N/A")),
+            "Beta (5Y Monthly)": info.get("beta", "N/A"),
+            "Volume": info.get("volume", "N/A"),
+            "EPS (TTM)": info.get("trailingEps", "N/A"),
+            "PE Ratio (TTM)": info.get("trailingPE", "N/A"),
+            "Forward Dividend & Yield": info.get("dividendYield", "N/A"),
+            "Avg. Volume": info.get("averageVolume", "N/A"),
+            "Profit Margin": f"{info.get('profitMargins', 0) * 100:.2f}%" if info.get("profitMargins") else "N/A",
+            "Return on Assets (TTM)": f"{info.get('returnOnAssets', 0) * 100:.2f}%" if info.get("returnOnAssets") else "N/A",
+            "Return on Equity (TTM)": f"{info.get('returnOnEquity', 0) * 100:.2f}%" if info.get("returnOnEquity") else "N/A"
+        }
+    return data
+
 # Fetch Data
 bank_nifty_data = fetch_stock_data(bank_nifty_ticker)
 selected_stock_data = fetch_stock_data(companies[selected_stock])
 selected_file = csv_files.get(selected_stock)
 data = load_data(selected_file)
 
+data = get_stock_data([tickers[selected_bank]])
+ticker = tickers[selected_bank]
+st.sidebar.header("📌 Key Metrics")
+st.sidebar.subheader(selected_bank)
+for key, value in data[ticker].items():
+    st.sidebar.write(f"**{key}:** {value}")
 # Display Metrics if Data is Available
 st.sidebar.header("📌 Key Metrics")
 if not selected_stock_data.empty:
