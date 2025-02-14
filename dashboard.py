@@ -226,12 +226,9 @@ with st.container():
             st.write(f"An error occurred: {e}")
             
     with col2:
-    st.subheader(f"Correlation Matrix - {selected_stock}")
-    plot_correlation_heatmap(selected_stock_data, selected_stock)
-
-    st.subheader("BankNifty Index")
-    with st.expander("View Image"):
-        if not bank_nifty_data.empty:
+        st.subheader("BankNifty Index")
+        with st.expander("View Image"):
+            if not bank_nifty_data.empty:
             image_url = "https://raw.githubusercontent.com/gauravdhale/BFMDEMO/main/heatmap.jpg"  # URL to the image in your GitHub repository
             st.image(image_url, caption="BankNifty Index Heatmap")
         else:
