@@ -189,21 +189,14 @@ with st.container():
         else:
             st.warning(f"No data available for {selected_stock}.")
         
-    with col3:
-        st.subheader("Profit vs Revenue")
-        profit_revenue_data = pd.DataFrame({
-            "Year": np.arange(2015, 2025),
-            "Total Revenue": np.random.randint(50000, 150000, 10),
-            "Net Profit": np.random.randint(5000, 30000, 10)
-        })
-        fig_pr, ax_pr = plt.subplots(figsize=(5, 3))
-        profit_revenue_data.set_index("Year").plot(kind="bar", ax=ax_pr, width=0.8, colormap="coolwarm")
-        ax_pr.set_title("Total Revenue vs Net Profit")
-        ax_pr.set_xlabel("Year")
-        ax_pr.set_ylabel("Amount (INR in Lakhs)")
-        ax_pr.grid(axis='y', linestyle="--", alpha=0.5)
-        ax_pr.legend()
-        st.pyplot(fig_pr)
+with col3:
+    st.subheader("BankNifty Index")
+    with st.expander("View Image"):
+        if not bank_nifty_data.empty:
+            image_url = "https://raw.githubusercontent.com/gauravdhale/BFMDEMO/main/heatmap.jpg"  # URL to the image in your GitHub repository
+            st.image(image_url, caption="BankNifty Index Heatmap")
+        else:
+            st.warning("No BankNifty data available.")
 
 # Second Row: Nifty Bank Composition Heatmap, Correlation Matrix, BankNifty Index Data Table
 with st.container():
