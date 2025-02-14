@@ -26,7 +26,6 @@ csv_files = {
     'Axis Bank': 'AXIS.csv',
     'Bank of Baroda': 'BARODA.csv'
 }
-
 bank_nifty_ticker = "^NSEBANK"
 
 # Streamlit Configuration
@@ -34,8 +33,8 @@ st.set_page_config(page_title="Banking Sector Dashboard", layout="wide")
 st.title("📊 Banking Sector Financial Dashboard")
 st.markdown("---")
 
-# Single Selection Dropdown
-selected_bank = st.sidebar.selectbox("🏦 Select a Bank", list(companies.keys()))
+# Selection Dropdown
+selected_stock = st.sidebar.selectbox("🔍 Select a Bank", list(companies.keys()))
 
 # Function to Fetch Stock Data
 def fetch_stock_data(ticker, period="5y"):
@@ -71,7 +70,7 @@ def load_data(file_name):
         st.write(f"Loading data from: {url}")
         df = pd.read_csv(url)
         df.columns = df.columns.str.strip()
-        df.rename(columns={"Open": "Actual Price", "Predicted_Open": "Predicted Price", "%_error": "% Error"}, inplace=True)
+        df.rename(columns={"Open": "Actual Price", "Predicted_Open": "Predicted Price"}, inplace=True)
         df["Date"] = pd.to_datetime(df["Date"], format="%d-%m-%Y", dayfirst=True, errors="coerce")
         df.set_index("Date", inplace=True)
         return df
@@ -79,18 +78,16 @@ def load_data(file_name):
         st.error(f"Error reading {file_name}: {e}")
         return pd.DataFrame()
 
-# Function to Plot Actual vs Predicted Prices with % Error
+# Function to Plot Actual vs Predicted Prices
 def plot_actual_vs_predicted(data, company_name):
     if data.empty:
         st.warning(f"No data available for {company_name}.")
         return
-
-    required_columns = ["Actual Price", "Predicted Price", "% Error"]
+    required_columns = ["Actual Price", "Predicted Price"]
     missing_columns = [col for col in required_columns if col not in data.columns]
     if missing_columns:
         st.error(f"⚠ Missing columns in CSV: {missing_columns}")
         return
-
     fig = go.Figure()
     fig.add_trace(go.Scatter(
         x=data.index, y=data["Actual Price"],
@@ -102,14 +99,8 @@ def plot_actual_vs_predicted(data, company_name):
         mode="lines", name="Predicted Price",
         line=dict(color="blue", dash="dash")
     ))
-    fig.add_trace(go.Scatter(
-        x=data.index, y=data["% Error"],
-        mode="lines", name="% Error",
-        line=dict(color="red", dash="dot")
-    ))
-    
     fig.update_layout(
-        title=f"{company_name} - Actual vs Predicted Prices with % Error",
+        title=f"{company_name} - Actual vs Predicted Prices",
         xaxis_title="Date",
         yaxis_title="Price",
         hovermode="x unified",
@@ -118,7 +109,6 @@ def plot_actual_vs_predicted(data, company_name):
         template="plotly_white",
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
     )
-
     st.plotly_chart(fig, use_container_width=True)
 
 # Function to Plot Correlation Heatmap
@@ -132,55 +122,14 @@ def plot_correlation_heatmap(data, company_name):
     ax.set_title(f"{company_name} - Correlation Matrix Heatmap")
     st.pyplot(fig)
 
-def format_market_cap(value):
-    if value >= 1e12:
-        return f"{value / 1e12:.2f}T"
-    elif value >= 1e9:
-        return f"{value / 1e9:.2f}B"
-    elif value >= 1e6:
-        return f"{value / 1e6:.2f}M"
-    return str(value)
-
-def get_stock_data(tickers):
-    data = {}
-    for ticker in tickers:
-        stock = yf.Ticker(ticker)
-        info = stock.info
-        data[ticker] = {
-            "Open": info.get("open", "N/A"),
-            "Close": info.get("previousClose", "N/A"),
-            "High": info.get("dayHigh", "N/A"),
-            "Low": info.get("dayLow", "N/A"),
-            "Market Cap": format_market_cap(info.get("marketCap", "N/A")),
-            "Beta (5Y Monthly)": info.get("beta", "N/A"),
-            "Volume": info.get("volume", "N/A"),
-            "EPS (TTM)": info.get("trailingEps", "N/A"),
-            "PE Ratio (TTM)": info.get("trailingPE", "N/A"),
-            "Forward Dividend & Yield": info.get("dividendYield", "N/A"),
-            "Avg. Volume": info.get("averageVolume", "N/A"),
-            "Profit Margin": f"{info.get('profitMargins', 0) * 100:.2f}%" if info.get("profitMargins") else "N/A",
-            "Return on Assets (TTM)": f"{info.get('returnOnAssets', 0) * 100:.2f}%" if info.get("returnOnAssets") else "N/A",
-            "Return on Equity (TTM)": f"{info.get('returnOnEquity', 0) * 100:.2f}%" if info.get("returnOnEquity") else "N/A"
-        }
-    return data
-
 # Fetch Data
 bank_nifty_data = fetch_stock_data(bank_nifty_ticker)
-selected_stock_data = fetch_stock_data(companies[selected_bank])
-selected_file = csv_files.get(selected_bank)
+selected_stock_data = fetch_stock_data(companies[selected_stock])
+selected_file = csv_files.get(selected_stock)
 data = load_data(selected_file)
 
-# Get Stock Metrics
-ticker = companies[selected_bank]
-stock_data = get_stock_data([ticker])
-
-# Display Stock Metrics in Sidebar
+# Display Metrics if Data is Available
 st.sidebar.header("📌 Key Metrics")
-st.sidebar.subheader(selected_bank)
-for key, value in stock_data[ticker].items():
-    st.sidebar.write(f"{key}: {value}")
-
-# Display Additional Metrics if Data is Available
 if not selected_stock_data.empty:
     latest_data = selected_stock_data.iloc[-1]
     metric_values = {
@@ -196,19 +145,8 @@ if not selected_stock_data.empty:
     for label, value in metric_values.items():
         st.sidebar.metric(label=label, value=f"{value:.2f}" if isinstance(value, (int, float)) else value)
 else:
-    st.sidebar.warning(f"No stock data available for {selected_bank}.")
+    st.sidebar.warning(f"No stock data available for {selected_stock}.")
 
-# Display Selected Bank Trend Subheader
-st.subheader(f"{selected_bank} Trend")
-
-# Plot selected bank data
-fig, ax = plt.subplots()
-ax.plot(selected_stock_data.index, selected_stock_data['Close'], label=f"{selected_bank} Close", color='red')
-ax.set_title(f"{selected_bank} Stock Price Trend")
-ax.set_xlabel('Date')
-ax.set_ylabel('Close Price')
-ax.legend()
-st.pyplot(fig)
 # Layout Adjustments for Proper Alignment
 st.markdown("## 📈 Market Trends")
 
@@ -230,7 +168,7 @@ with st.container():
             st.warning("No data available for BankNifty.")
         
     with col2:
-        st.subheader(f"{selected_bank} Trend")
+        st.subheader(f"{selected_stock} Trend")
         if not selected_stock_data.empty:
             fig2, ax2 = plt.subplots(figsize=(5, 3))
             ax2.plot(selected_stock_data.index, selected_stock_data['Close'], label=f"{selected_stock} Close", color='red')
