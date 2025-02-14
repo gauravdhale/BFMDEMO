@@ -234,7 +234,6 @@ with st.container():
         else:
             st.warning("No BankNifty data available.")
     
-    # Ensure this subheader is correctly indented within the `with col2` block
     st.subheader("BankNifty Correlation Matrix")
         
     with col3:
