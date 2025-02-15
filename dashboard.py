@@ -35,8 +35,52 @@ st.markdown("---")
 
 # Sidebar Configuration
 st.sidebar.header("📌 Key Metrics")
-st.sidebar.header("Stock Metrics")
 selected_bank = st.sidebar.selectbox("Select a bank", list(companies.keys()))
+
+# Function to Format Market Cap
+def format_market_cap(value):
+    if value >= 1e12:
+        return f"{value / 1e12:.2f}T"
+    elif value >= 1e9:
+        return f"{value / 1e9:.2f}B"
+    elif value >= 1e6:
+        return f"{value / 1e6:.2f}M"
+    return str(value)
+
+# Function to Retrieve Stock Data
+def get_stock_data(tickers):
+    data = {}
+    for ticker in tickers:
+        stock = yf.Ticker(ticker)
+        info = stock.info
+        data[ticker] = {
+            "Open": info.get("open", "N/A"),
+            "Close": info.get("previousClose", "N/A"),
+            "High": info.get("dayHigh", "N/A"),
+            "Low": info.get("dayLow", "N/A"),
+            "Market Cap": format_market_cap(info.get("marketCap", "N/A")),
+            "Beta (5Y Monthly)": info.get("beta", "N/A"),
+            "Volume": info.get("volume", "N/A"),
+            "EPS (TTM)": info.get("trailingEps", "N/A"),
+            "PE Ratio (TTM)": info.get("trailingPE", "N/A"),
+            "Forward Dividend & Yield": info.get("dividendYield", "N/A"),
+            "Avg. Volume": info.get("averageVolume", "N/A"),
+            "Profit Margin": f"{info.get('profitMargins', 0) * 100:.2f}%" if info.get("profitMargins") else "N/A",
+            "Return on Assets (TTM)": f"{info.get('returnOnAssets', 0) * 100:.2f}%" if info.get("returnOnAssets") else "N/A",
+            "Return on Equity (TTM)": f"{info.get('returnOnEquity', 0) * 100:.2f}%" if info.get("returnOnEquity") else "N/A"
+        }
+    return data
+
+# Fetch Stock Data for Selected Bank
+data = get_stock_data([companies[selected_bank]])
+ticker = companies[selected_bank]
+
+# Display Stock Metrics in Sidebar
+st.sidebar.subheader(selected_bank)
+for key, value in data[ticker].items():
+    st.sidebar.write(f"{key}: {value}")
+
+# Main Code Continues...
 selected_stock = st.sidebar.selectbox("🔍 Select a Bank", list(companies.keys()))
 
 # Function to Fetch Stock Data
@@ -204,7 +248,8 @@ with st.container():
         ax_pr.grid(axis='y', linestyle="--", alpha=0.5)
         ax_pr.legend()
         st.pyplot(fig_pr)
-        # Second Row: Nifty Bank Composition Heatmap, Correlation Matrix, BankNifty Index Data Table
+
+# Second Row: Nifty Bank Composition Heatmap, Correlation Matrix, BankNifty Index Data Table
 with st.container():
     col1, col2, col3 = st.columns(3, gap="medium")
     
@@ -255,3 +300,4 @@ with st.container():
 st.markdown("---")
 
 st.success("🎯 Analysis Completed!")
+    
