@@ -181,22 +181,7 @@ selected_stock_data = fetch_stock_data(companies[selected_bank])
 selected_file = csv_files.get(selected_bank)
 data = load_data(selected_file)
 
-# Display Metrics if Data is Available
-if not selected_stock_data.empty:
-    latest_data = selected_stock_data.iloc[-1]
-    metric_values = {
-        "Open": latest_data["Open"],
-        "Close": latest_data["Close"],
-        "High": latest_data["High"],
-        "Low": latest_data["Low"],
-        "EPS": np.random.uniform(10, 50),
-        "P/E Ratio": np.random.uniform(5, 30),
-        "Dividend": np.random.uniform(1, 5)
-    }
-    for label, value in metric_values.items():
-        st.sidebar.metric(label=label, value=f"{value:.2f}" if isinstance(value, (int, float)) else value)
-else:
-    st.sidebar.warning(f"No stock data available for {selected_bank}.")
+
 
 # Layout Adjustments for Proper Alignment
 st.markdown("## 📈 Market Trends")
