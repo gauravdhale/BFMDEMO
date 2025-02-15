@@ -33,7 +33,10 @@ st.set_page_config(page_title="Banking Sector Dashboard", layout="wide")
 st.title("📊 Banking Sector Financial Dashboard")
 st.markdown("---")
 
-# Selection Dropdown
+# Sidebar Configuration
+st.sidebar.header("📌 Key Metrics")
+st.sidebar.header("Stock Metrics")
+selected_bank = st.sidebar.selectbox("Select a bank", list(companies.keys()))
 selected_stock = st.sidebar.selectbox("🔍 Select a Bank", list(companies.keys()))
 
 # Function to Fetch Stock Data
@@ -137,7 +140,6 @@ selected_file = csv_files.get(selected_stock)
 data = load_data(selected_file)
 
 # Display Metrics if Data is Available
-st.sidebar.header("📌 Key Metrics")
 if not selected_stock_data.empty:
     latest_data = selected_stock_data.iloc[-1]
     metric_values = {
@@ -153,8 +155,6 @@ if not selected_stock_data.empty:
         st.sidebar.metric(label=label, value=f"{value:.2f}" if isinstance(value, (int, float)) else value)
 else:
     st.sidebar.warning(f"No stock data available for {selected_stock}.")
-
-
 
 # Layout Adjustments for Proper Alignment
 st.markdown("## 📈 Market Trends")
@@ -204,8 +204,7 @@ with st.container():
         ax_pr.grid(axis='y', linestyle="--", alpha=0.5)
         ax_pr.legend()
         st.pyplot(fig_pr)
-
-# Second Row: Nifty Bank Composition Heatmap, Correlation Matrix, BankNifty Index Data Table
+        # Second Row: Nifty Bank Composition Heatmap, Correlation Matrix, BankNifty Index Data Table
 with st.container():
     col1, col2, col3 = st.columns(3, gap="medium")
     
