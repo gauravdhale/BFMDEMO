@@ -80,9 +80,6 @@ st.sidebar.subheader(selected_bank)
 for key, value in data[ticker].items():
     st.sidebar.write(f"{key}: {value}")
 
-# Main Code Continues...
-selected_stock = st.sidebar.selectbox("🔍 Select a Bank", list(companies.keys()))
-
 # Function to Fetch Stock Data
 def fetch_stock_data(ticker, period="5y"):
     try:
@@ -166,6 +163,7 @@ def plot_actual_vs_predicted(data, company_name):
     )
 
     st.plotly_chart(fig, use_container_width=True)
+
 # Function to Plot Correlation Heatmap
 def plot_correlation_heatmap(data, company_name):
     if data.empty:
@@ -179,8 +177,8 @@ def plot_correlation_heatmap(data, company_name):
 
 # Fetch Data
 bank_nifty_data = fetch_stock_data(bank_nifty_ticker)
-selected_stock_data = fetch_stock_data(companies[selected_stock])
-selected_file = csv_files.get(selected_stock)
+selected_stock_data = fetch_stock_data(companies[selected_bank])
+selected_file = csv_files.get(selected_bank)
 data = load_data(selected_file)
 
 # Display Metrics if Data is Available
@@ -198,7 +196,7 @@ if not selected_stock_data.empty:
     for label, value in metric_values.items():
         st.sidebar.metric(label=label, value=f"{value:.2f}" if isinstance(value, (int, float)) else value)
 else:
-    st.sidebar.warning(f"No stock data available for {selected_stock}.")
+    st.sidebar.warning(f"No stock data available for {selected_bank}.")
 
 # Layout Adjustments for Proper Alignment
 st.markdown("## 📈 Market Trends")
@@ -221,17 +219,17 @@ with st.container():
             st.warning("No data available for BankNifty.")
         
     with col2:
-        st.subheader(f"{selected_stock} Trend")
+        st.subheader(f"{selected_bank} Trend")
         if not selected_stock_data.empty:
             fig2, ax2 = plt.subplots(figsize=(5, 3))
-            ax2.plot(selected_stock_data.index, selected_stock_data['Close'], label=f"{selected_stock} Close", color='red')
+            ax2.plot(selected_stock_data.index, selected_stock_data['Close'], label=f"{selected_bank} Close", color='red')
             ax2.set_xlabel("Date")
             ax2.set_ylabel("Close Price")
             ax2.legend()
             ax2.grid(True, linestyle='--', alpha=0.5)
             st.pyplot(fig2)
         else:
-            st.warning(f"No data available for {selected_stock}.")
+            st.warning(f"No data available for {selected_bank}.")
         
     with col3:
         st.subheader("Profit vs Revenue")
@@ -295,9 +293,8 @@ with st.container():
 # Third Row: Prediction vs Actual
 with st.container():
     st.subheader("Prediction vs Actual")
-    plot_actual_vs_predicted(data, selected_stock)
+    plot_actual_vs_predicted(data, selected_bank)
 
 st.markdown("---")
 
 st.success("🎯 Analysis Completed!")
-    
