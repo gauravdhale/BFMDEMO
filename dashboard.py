@@ -48,21 +48,14 @@ def format_market_cap(value):
     return str(value)
 
 # Function to Retrieve Stock Data
-def format_market_cap(market_cap):
-    # Add your format_market_cap function here
-    pass
-
 def get_stock_data(tickers):
     data = {}
     for ticker in tickers:
         stock = yf.Ticker(ticker)
         info = stock.info
-        hist = stock.history(period="1d")
-        current_close = hist['Close'][0] if not hist.empty else "N/A"
-        
         data[ticker] = {
             "Open": info.get("open", "N/A"),
-            "Close": current_close,
+            "Close": info.get("previousClose", "N/A"),
             "High": info.get("dayHigh", "N/A"),
             "Low": info.get("dayLow", "N/A"),
             "Market Cap": format_market_cap(info.get("marketCap", "N/A")),
@@ -77,6 +70,7 @@ def get_stock_data(tickers):
             "Return on Equity (TTM)": f"{info.get('returnOnEquity', 0) * 100:.2f}%" if info.get("returnOnEquity") else "N/A"
         }
     return data
+
 # Fetch Stock Data for Selected Bank
 data = get_stock_data([companies[selected_bank]])
 ticker = companies[selected_bank]
@@ -264,8 +258,8 @@ with st.container():
             df_heatmap = pd.read_csv(github_url, encoding='ISO-8859-1')
             if 'Company' in df_heatmap.columns and 'Weight(%)' in df_heatmap.columns:
                 df_heatmap.set_index('Company', inplace=True)
-                sns.heatmap(df_heatmap[['Weight(%)']], annot=True, cmap='YlGnBu', cbar=True, linewidths=0.5, ax=ax_hm)
                 fig_hm, ax_hm = plt.subplots(figsize=(5, 3))
+                sns.heatmap(df_heatmap[['Weight(%)']], annot=True, cmap='YlGnBu', cbar=True, linewidths=0.5, ax=ax_hm)
                 ax_hm.set_title('Nifty Bank Composition')
                 st.pyplot(fig_hm)
             else:
