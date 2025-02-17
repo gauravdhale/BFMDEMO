@@ -48,14 +48,21 @@ def format_market_cap(value):
     return str(value)
 
 # Function to Retrieve Stock Data
+def format_market_cap(market_cap):
+    # Add your format_market_cap function here
+    pass
+
 def get_stock_data(tickers):
     data = {}
     for ticker in tickers:
         stock = yf.Ticker(ticker)
         info = stock.info
+        hist = stock.history(period="1d")
+        current_close = hist['Close'][0] if not hist.empty else "N/A"
+        
         data[ticker] = {
             "Open": info.get("open", "N/A"),
-            "Close": info.get("previousClose", "N/A"),
+            "Close": current_close,
             "High": info.get("dayHigh", "N/A"),
             "Low": info.get("dayLow", "N/A"),
             "Market Cap": format_market_cap(info.get("marketCap", "N/A")),
@@ -70,7 +77,6 @@ def get_stock_data(tickers):
             "Return on Equity (TTM)": f"{info.get('returnOnEquity', 0) * 100:.2f}%" if info.get("returnOnEquity") else "N/A"
         }
     return data
-
 # Fetch Stock Data for Selected Bank
 data = get_stock_data([companies[selected_bank]])
 ticker = companies[selected_bank]
