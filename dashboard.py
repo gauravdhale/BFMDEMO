@@ -197,9 +197,9 @@ def plot_eps(bank_name):
         ax.legend()
         ax.grid(True)
         st.pyplot(fig)
-    else:
-        st.error(f"Bank '{bank_name}'
-        st.error(f"Bank '{bank_name}' not found. Please select a valid bank.")
+        else:
+            st.error(f"Bank '{bank_name}'
+            st.error(f"Bank '{bank_name}' not found. Please select a valid bank.")
 
 st.title("Bank EPS Visualization")
 bank_name = st.selectbox("Select a bank:", ["State Bank of India", "Kotak Mahindra Bank", "Axis Bank", "Bank of Baroda", "HDFC Bank", "ICICI Bank"])
