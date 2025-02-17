@@ -1,4 +1,3 @@
-
 import streamlit as st
 import yfinance as yf
 import pandas as pd
@@ -175,6 +174,7 @@ def plot_correlation_heatmap(data, company_name):
     sns.heatmap(corr, annot=True, cmap='coolwarm', vmin=0.35, vmax=1.00, linewidths=0.5, ax=ax)
     ax.set_title(f"{company_name} - Correlation Matrix Heatmap")
     st.pyplot(fig)
+
 # Fetch Data
 bank_nifty_data = fetch_stock_data(bank_nifty_ticker)
 selected_stock_data = fetch_stock_data(companies[selected_bank])
@@ -205,26 +205,47 @@ def plot_eps(bank_name):
     else:
         st.error(f"Bank '{bank_name}' not found. Please select a valid bank.")
 
-# Display EPS Visualization in Sidebar
-st.sidebar.subheader("EPS Visualization")
-plot_eps(selected_bank)
+st.title("Bank EPS Visualization")
+bank_name = st.selectbox("Select a bank:", ["State Bank of India", "Kotak Mahindra Bank", "Axis Bank", "Bank of Baroda", "HDFC Bank", "ICICI Bank"])
 
-# Plot and Display Graphs
-st.header(f"{selected_bank} Stock Analysis")
-st.subheader("Stock Price Data")
-st.line_chart(selected_stock_data["Close"])
 
-st.subheader("Moving Averages (20, 50 days)")
-st.line_chart(selected_stock_data[["Close", "MA_20", "MA_50"]])
 
-st.subheader("Price Change %")
-st.line_chart(selected_stock_data["Price_Change"])
+# Layout Adjustments for Proper Alignment
+st.markdown("## 📈 Market Trends")
 
-st.subheader("Actual vs Predicted Prices with % Error")
-plot_actual_vs_predicted(data, selected_bank)
-
-st.subheader("Correlation Heatmap")
-plot_correlation_heatmap(data, selected_bank)
+# First Row: BankNifty Trend, Selected Bank Trend, Profit vs Revenue
+with st.container():
+    col1, col2, col3 = st.columns(3, gap="medium")
+    
+    with col1:
+        st.subheader("BankNifty Trend")
+        if not bank_nifty_data.empty:
+            fig1, ax1 = plt.subplots(figsize=(5, 3))
+            ax1.plot(bank_nifty_data.index, bank_nifty_data['Close'], label="BankNifty Close", color='blue')
+            ax1.set_xlabel("Date")
+            ax1.set_ylabel("Close Price")
+            ax1.legend()
+            ax1.grid(True, linestyle='--', alpha=0.5)
+            st.pyplot(fig1)
+        else:
+            st.warning("No data available for BankNifty.")
+        
+    with col2:
+        st.subheader(f"{selected_bank} Trend")
+        if not selected_stock_data.empty:
+            fig2, ax2 = plt.subplots(figsize=(5, 3))
+            ax2.plot(selected_stock_data.index, selected_stock_data['Close'], label=f"{selected_bank} Close", color='red')
+            ax2.set_xlabel("Date")
+            ax2.set_ylabel("Close Price")
+            ax2.legend()
+            ax2.grid(True, linestyle='--', alpha=0.5)
+            st.pyplot(fig2)
+        else:
+            st.warning(f"No data available for {selected_bank}.")
+        
+    with col3:
+        st.subheader("Earnings Per Share (EPS)")
+        plot_eps(bank_name)
 
 # Second Row: Nifty Bank Composition Heatmap, Correlation Matrix, BankNifty Index Data Table
 with st.container():
