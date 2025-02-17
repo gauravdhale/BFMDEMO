@@ -261,15 +261,15 @@ with st.container():
                 st.warning("No BankNifty data available.")
         
     with col3:
-        st.subheader("BankNifty Index Data Table")
-        if not bank_nifty_data.empty:
-            styled_df = bank_nifty_data.tail(10).style.format({
-                "Close": "{:.2f}",
-                "Open": "{:.2f}",
-                "High": "{:.2f}",
-                 "Low": "{:.2f}"
-            })
-            st.dataframe(styled_df)
+            st.subheader("BankNifty Index Data Table")
+            if not bank_nifty_data.empty:
+                styled_df = bank_nifty_data.tail(10).style.format({
+                    "Close": "{:.2f}",
+                    "Open": "{:.2f}",
+                    "High": "{:.2f}",
+                     "Low": "{:.2f}"
+                })
+                st.dataframe(styled_df)
             else:
                 st.warning("No BankNifty data available.")
 
