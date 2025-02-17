@@ -181,6 +181,33 @@ selected_stock_data = fetch_stock_data(companies[selected_bank])
 selected_file = csv_files.get(selected_bank)
 data = load_data(selected_file)
 
+def plot_eps(bank_name):
+    eps_data = {
+        "State Bank of India": [22.15, 25.11, 39.64, 62.23, 75.17, 88.91],
+        "Kotak Mahindra Bank": [18.49, 20.25, 38.62, 52.77, 61.41, 113.32],
+        "Axis Bank": [-60.94, -33.64, 18.46, 21.76, 67.38, 91.02],
+        "Bank of Baroda": [-45.33, -27.55, -11.08, 13.48, 22.65, 39.50],
+        "HDFC Bank": [25.74, 27.96, 39.49, 57.69, 53.82, 90.95],
+        "ICICI Bank": [-9.46, -0.03, 21.15, 36.13, 53.04, 69.66]
+    }
+    
+    years = np.array([2020, 2021, 2022, 2023, 2024, 2025])
+    
+    if bank_name in eps_data:
+        fig, ax = plt.subplots(figsize=(5, 3))
+        ax.plot(years, eps_data[bank_name], marker='o', linestyle='-', label=bank_name)
+        ax.set_xlabel("Year")
+        ax.set_ylabel("EPS")
+        ax.set_title(f"Earnings Per Share (EPS) of {bank_name}")
+        ax.legend()
+        ax.grid(True)
+        st.pyplot(fig)
+    else:
+        st.error(f"Bank '{bank_name}' not found. Please select a valid bank.")
+
+st.title("Bank EPS Visualization")
+bank_name = st.selectbox("Select a bank:", ["State Bank of India", "Kotak Mahindra Bank", "Axis Bank", "Bank of Baroda", "HDFC Bank", "ICICI Bank"])
+
 
 
 # Layout Adjustments for Proper Alignment
@@ -217,20 +244,8 @@ with st.container():
             st.warning(f"No data available for {selected_bank}.")
         
     with col3:
-        st.subheader("Profit vs Revenue")
-        profit_revenue_data = pd.DataFrame({
-            "Year": np.arange(2015, 2025),
-            "Total Revenue": np.random.randint(50000, 150000, 10),
-            "Net Profit": np.random.randint(5000, 30000, 10)
-        })
-        fig_pr, ax_pr = plt.subplots(figsize=(5, 3))
-        profit_revenue_data.set_index("Year").plot(kind="bar", ax=ax_pr, width=0.8, colormap="coolwarm")
-        ax_pr.set_title("Total Revenue vs Net Profit")
-        ax_pr.set_xlabel("Year")
-        ax_pr.set_ylabel("Amount (INR in Lakhs)")
-        ax_pr.grid(axis='y', linestyle="--", alpha=0.5)
-        ax_pr.legend()
-        st.pyplot(fig_pr)
+        st.subheader("Earnings Per Share (EPS)")
+        plot_eps(bank_name)
 
 # Second Row: Nifty Bank Composition Heatmap, Correlation Matrix, BankNifty Index Data Table
 with st.container():
