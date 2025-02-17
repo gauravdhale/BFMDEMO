@@ -175,39 +175,18 @@ def plot_correlation_heatmap(data, company_name):
     ax.set_title(f"{company_name} - Correlation Matrix Heatmap")
     st.pyplot(fig)
 
-# Function to Plot EPS
-def plot_eps(bank_name):
-    eps_data = {
-        "State Bank of India": [22.15, 25.11, 39.64, 62.23, 75.17],
-        "Kotak Mahindra Bank": [25, 27, 29, 30, 28],
-        "Axis Bank": [20, 22, 21, 23, 24],
-        "Bank of Baroda": [8, 10, 9, 12, 13],
-        "HDFC Bank": [25., 32, 34, 36, 38],
-        "ICICI Bank": [22, 24, 26, 27, 28]
-    }
-    
-    years = np.array([2020, 2021, 2022, 2023, 2024])
-    
-    if bank_name in eps_data:
-        fig, ax = plt.subplots(figsize=(8, 5))
-        ax.plot(years, eps_data[bank_name], marker='o', linestyle='-', label=bank_name)
-        ax.set_xlabel("Year")
-        ax.set_ylabel("EPS")
-        ax.set_title(f"Earnings Per Share (EPS) of {bank_name}")
-        ax.legend()
-        ax.grid(True)
-        st.pyplot(fig)
-    else:
-        st.error(f"Bank '{bank_name}' not found. Please select a valid bank.")
+# Fetch Data
+bank_nifty_data = fetch_stock_data(bank_nifty_ticker)
+selected_stock_data = fetch_stock_data(companies[selected_bank])
+selected_file = csv_files.get(selected_bank)
+data = load_data(selected_file)
 
-st.title("Bank EPS Visualization")
-bank_name = st.selectbox("Select a bank:", ["State Bank of India", "Kotak Mahindra Bank", "Axis Bank", "Bank of Baroda", "HDFC Bank", "ICICI Bank"])
-plot_eps(bank_name)
+
 
 # Layout Adjustments for Proper Alignment
 st.markdown("## 📈 Market Trends")
 
-# First Row: BankNifty Trend, Selected Bank EPS, Profit vs Revenue
+# First Row: BankNifty Trend, Selected Bank Trend, Profit vs Revenue
 with st.container():
     col1, col2, col3 = st.columns(3, gap="medium")
     
@@ -225,8 +204,17 @@ with st.container():
             st.warning("No data available for BankNifty.")
         
     with col2:
-        st.subheader(f"{selected_bank} EPS")
-        plot_eps(selected_bank)
+        st.subheader(f"{selected_bank} Trend")
+        if not selected_stock_data.empty:
+            fig2, ax2 = plt.subplots(figsize=(5, 3))
+            ax2.plot(selected_stock_data.index, selected_stock_data['Close'], label=f"{selected_bank} Close", color='red')
+            ax2.set_xlabel("Date")
+            ax2.set_ylabel("Close Price")
+            ax2.legend()
+            ax2.grid(True, linestyle='--', alpha=0.5)
+            st.pyplot(fig2)
+        else:
+            st.warning(f"No data available for {selected_bank}.")
         
     with col3:
         st.subheader("Profit vs Revenue")
@@ -295,4 +283,3 @@ with st.container():
 st.markdown("---")
 
 st.success("🎯 Analysis Completed!")
-        
