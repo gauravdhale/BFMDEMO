@@ -262,17 +262,16 @@ with st.container():
         
     with col3:
         st.subheader("BankNifty Index Data Table")
-        with st.expander("View Data Table"):
-            if not bank_nifty_data.empty:
-                styled_df = bank_nifty_data.tail(10).style.format({
-                    "Close": "{:.2f}",
-                    "Open": "{:.2f}",
-                    "High": "{:.2f}",
-                    "Low": "{:.2f}"
-                })
-                st.dataframe(styled_df)
-            else:
-                st.warning("No BankNifty data available.")
+        if not bank_nifty_data.empty:
+            styled_df = bank_nifty_data.tail(10).style.format({
+                "Close": "{:.2f}",
+                "Open": "{:.2f}",
+                "High": "{:.2f}",
+                 "Low": "{:.2f}"
+            })
+            st.dataframe(styled_df)
+         else:
+            st.warning("No BankNifty data available.")
 
 # Third Row: Prediction vs Actual
 with st.container():
