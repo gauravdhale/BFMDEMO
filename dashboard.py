@@ -270,7 +270,7 @@ with st.container():
                  "Low": "{:.2f}"
             })
             st.dataframe(styled_df)
-             else:
+            else:
                 st.warning("No BankNifty data available.")
 
 # Third Row: Prediction vs Actual
