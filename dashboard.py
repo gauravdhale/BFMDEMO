@@ -76,7 +76,7 @@ def get_stock_data(tickers):
 def format_market_cap(market_cap):
     if market_cap == "N/A":
         return market_cap
-    return f"${market_cap/1e9:.2f}B" if market_cap else "N/A"
+    return f"{market_cap/1e9:.2f}" if market_cap else "N/A"
 
 # Example usage
 tickers = ["AAPL", "MSFT", "GOOGL"]
