@@ -60,7 +60,7 @@ def get_stock_data(tickers):
             "Close": close_price,
             "High": info.get("dayHigh", "N/A"),
             "Low": info.get("dayLow", "N/A"),
-            "Market Cap": format_market_cap(info.get("marketCap", "N/A")),
+            "Market Cap": info.get("marketCap", "N/A"),  # Directly from yfinance
             "Beta (5Y Monthly)": info.get("beta", "N/A"),
             "Volume": info.get("volume", "N/A"),
             "EPS (TTM)": info.get("trailingEps", "N/A"),
@@ -71,12 +71,6 @@ def get_stock_data(tickers):
             "Return on Equity (TTM)": f"{info.get('returnOnEquity', 0) * 100:.2f}%" if info.get("returnOnEquity") else "N/A"
         }
     return data
-
-# This function formats the market cap in a human-readable format
-def format_market_cap(market_cap):
-    if market_cap == "N/A":
-        return market_cap
-    return f"{market_cap/1e9:.2f}" if market_cap else "N/A"
 
 # Example usage
 tickers = ["AAPL", "MSFT", "GOOGL"]
