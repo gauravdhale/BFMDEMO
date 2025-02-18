@@ -77,13 +77,13 @@ def format_market_cap(market_cap):
     if market_cap == "N/A":
         return market_cap
     if market_cap >= 1e12:
-        return f"${market_cap/1e12:.2f}T"  # Trillions
+        return f"{market_cap/1e12:.2f}T"  # Trillions
     elif market_cap >= 1e9:
-        return f"${market_cap/1e9:.2f}B"  # Billions
+        return f"{market_cap/1e9:.2f}B"  # Billions
     elif market_cap >= 1e6:
-        return f"${market_cap/1e6:.2f}M"  # Millions
+        return f"{market_cap/1e6:.2f}M"  # Millions
     else:
-        return f"${market_cap:.2f}"
+        return f"{market_cap:.2f}"
 
 # Example usage
 tickers = ["AAPL", "MSFT", "GOOGL"]
