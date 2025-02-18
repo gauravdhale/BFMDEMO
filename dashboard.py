@@ -67,7 +67,6 @@ def get_stock_data(tickers):
             "PE Ratio (TTM)": info.get("trailingPE", "N/A"),
             "Forward Dividend & Yield": info.get("dividendYield", "N/A"),
             "Avg. Volume": info.get("averageVolume", "N/A"),
-            "Profit Margin": f"{info.get('profitMargins', 0) * 100:.2f}%" if info.get("profitMargins") else "N/A",
             "Return on Assets (TTM)": f"{info.get('returnOnAssets', 0) * 100:.2f}%" if info.get("returnOnAssets") else "N/A",
             "Return on Equity (TTM)": f"{info.get('returnOnEquity', 0) * 100:.2f}%" if info.get("returnOnEquity") else "N/A"
         }
