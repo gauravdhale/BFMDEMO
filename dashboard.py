@@ -53,9 +53,11 @@ def get_stock_data(tickers):
     for ticker in tickers:
         stock = yf.Ticker(ticker)
         info = stock.info
+        hist = stock.history(period="1d")
+        close_price = hist['Close'].iloc[-1] if not hist.empty else "N/A"
         data[ticker] = {
             "Open": info.get("open", "N/A"),
-            "Close": info.get("previousClose", "N/A"),
+            "Close": close_price,
             "High": info.get("dayHigh", "N/A"),
             "Low": info.get("dayLow", "N/A"),
             "Market Cap": format_market_cap(info.get("marketCap", "N/A")),
@@ -70,6 +72,17 @@ def get_stock_data(tickers):
             "Return on Equity (TTM)": f"{info.get('returnOnEquity', 0) * 100:.2f}%" if info.get("returnOnEquity") else "N/A"
         }
     return data
+
+# This function formats the market cap in a human-readable format
+def format_market_cap(market_cap):
+    if market_cap == "N/A":
+        return market_cap
+    return f"${market_cap/1e9:.2f}B" if market_cap else "N/A"
+
+# Example usage
+tickers = ["AAPL", "MSFT", "GOOGL"]
+stock_data = get_stock_data(tickers)
+print(stock_data)
 
 # Fetch Stock Data for Selected Bank
 data = get_stock_data([companies[selected_bank]])
